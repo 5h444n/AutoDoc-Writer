@@ -40,3 +40,97 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Login page styles */
+.login-root {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #f6f8fa 0%, #ffffff 100%);
+  padding: 2rem;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(20, 20, 30, 0.08);
+  padding: 2.25rem;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.login-title {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.8rem;
+  color: #0f172a;
+}
+
+.login-sub {
+  margin: 0 0 1.25rem 0;
+  color: #5b6270;
+  font-size: 0.95rem;
+}
+
+.github-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  border-radius: 8px;
+  background: #24292f; /* GitHub dark */
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 600;
+  box-shadow: 0 6px 18px rgba(36, 41, 47, 0.12);
+  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+}
+
+.github-btn:hover,
+.github-btn:focus {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(36, 41, 47, 0.16);
+}
+
+.github-logo {
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  color: #ffffff;
+}
+
+.login-note {
+  margin-top: 1rem;
+  color: #8c9099;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    padding: 1.5rem;
+    border-radius: 10px;
+  }
+  .login-title {
+    font-size: 1.5rem;
+  }
+}
+
+/* Disabled state for the GitHub button when client-side OAuth is not configured */
+.github-btn[aria-disabled="true"] {
+  pointer-events: none;
+  opacity: 0.55;
+  transform: none;
+  box-shadow: none;
+  cursor: not-allowed;
+  background: #6e757b; /* muted gray */
+}
+
+.github-btn[aria-disabled="true"]:hover,
+.github-btn[aria-disabled="true"]:focus {
+  transform: none;
+  box-shadow: none;
+}
