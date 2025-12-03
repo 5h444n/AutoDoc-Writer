@@ -1,6 +1,7 @@
 fastapi
 uvicorn
+httpx
 pygithub
-google-generativeai
-sqlalchemy
 python-dotenv
+sqlalchemy
+google-generativeai

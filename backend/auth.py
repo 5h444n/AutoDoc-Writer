@@ -4,67 +4,74 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import RedirectResponse
 from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
+load_dotenv()  # Load .env variables
 
-# Create a router instead of an app
 router = APIRouter()
 
-# --- Configuration ---
+# Load configuration from environment
 GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID")
 GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET")
+REDIRECT_URI = os.getenv("REDIRECT_URI")
+
 GITHUB_AUTH_URL = "https://github.com/login/oauth/authorize"
 GITHUB_TOKEN_URL = "https://github.com/login/oauth/access_token"
+
 
 @router.get("/login")
 async def login():
     """
-    Redirects the user to the GitHub OAuth authorization page.
+    Redirects the user to GitHub OAuth authorization page.
     """
-    if not GITHUB_CLIENT_ID or not GITHUB_CLIENT_SECRET:
-        raise HTTPException(status_code=500, detail="Server configuration error: Missing GitHub credentials in .env file.")
+    if not GITHUB_CLIENT_ID:
+        raise HTTPException(status_code=500, detail="Missing GitHub Client ID")
 
-    params = {
-        "client_id": GITHUB_CLIENT_ID,
-        "scope": "repo read:user",
-        "redirect_uri": "http://localhost:8000/callback"
-    }
-    
-    auth_url = f"{GITHUB_AUTH_URL}?client_id={params['client_id']}&scope={params['scope']}&redirect_uri={params['redirect_uri']}"
+    auth_url = (
+        f"{GITHUB_AUTH_URL}"
+        f"?client_id={GITHUB_CLIENT_ID}"
+        f"&redirect_uri={REDIRECT_URI}"
+        f"&scope=repo read:user"
+    )
+
     return RedirectResponse(url=auth_url)
+
 
 @router.get("/callback")
 async def callback(code: str):
     """
-    Handles the callback from GitHub, exchanges the code for an access token.
+    GitHub OAuth callback - exchanges code for access token.
     """
     if not code:
-        raise HTTPException(status_code=400, detail="Authorization code not found.")
+        raise HTTPException(status_code=400, detail="No code provided")
 
     payload = {
         "client_id": GITHUB_CLIENT_ID,
         "client_secret": GITHUB_CLIENT_SECRET,
         "code": code,
-        "redirect_uri": "http://localhost:8000/callback"
+        "redirect_uri": REDIRECT_URI,
     }
 
     headers = {"Accept": "application/json"}
 
     async with httpx.AsyncClient() as client:
         try:
-            response = await client.post(GITHUB_TOKEN_URL, json=payload, headers=headers)
+            response = await client.post(
+                GITHUB_TOKEN_URL, json=payload, headers=headers
+            )
             response.raise_for_status()
         except httpx.RequestError as exc:
-             raise HTTPException(status_code=500, detail=f"Failed to communicate with GitHub: {exc}")
+            raise HTTPException(status_code=500, detail=f"GitHub communication error: {exc}")
 
-    data = response.json()
-    
-    if "error" in data:
-        raise HTTPException(status_code=400, detail=f"GitHub Error: {data.get('error_description')}")
+    token_data = response.json()
+
+    if "error" in token_data:
+        raise HTTPException(
+            status_code=400,
+            detail=f"GitHub OAuth Error: {token_data.get('error_description')}",
+        )
 
     return {
-        "access_token": data.get("access_token"),
-        "token_type": data.get("token_type"),
-        "scope": data.get("scope"),
-        "message": "Successfully logged in via GitHub!"
+        "message": "Successfully authenticated!",
+        "access_token": token_data.get("access_token"),
+        "scope": token_data.get("scope"),
+        "token_type": token_data.get("token_type"),
     }
