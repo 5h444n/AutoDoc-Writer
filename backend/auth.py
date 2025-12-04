@@ -9,9 +9,9 @@ load_dotenv()  # Load .env variables
 router = APIRouter()
 
 # Load configuration from environment
-GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID")
-GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET")
-REDIRECT_URI = os.getenv("REDIRECT_URI")
+GITHUB_CLIENT_ID = os.getenv("Ov23li8Xv12JtpIeK9TM")
+GITHUB_CLIENT_SECRET = os.getenv("fa489d25f69902e484121b825cabbb0db870de4d")
+REDIRECT_URI = os.getenv("http://localhost:8000/auth/callback")
 
 GITHUB_AUTH_URL = "https://github.com/login/oauth/authorize"
 GITHUB_TOKEN_URL = "https://github.com/login/oauth/access_token"
