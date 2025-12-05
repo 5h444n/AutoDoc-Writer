@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoDoc Writer - Log In</title>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css"> 
+</head>
+<body>
+
+    <div class="login-card">
+        <h1>AutoDoc Writer</h1>
+        <p class="subtitle">
+            Automate your documentation with research-grade precision.
+        </p>
+
+        <form action="#">
+            <div class="input-group">
+                <input type="email" placeholder="Email" required>
+            </div>
+            
+            <div class="input-group">
+                <input type="password" placeholder="Password" required>
+            </div>
+
+            <button type="button">Log In</button>
+        </form>
+
+        <div class="footer-links">
+            <p>New to AutoDoc? <a href="signup.html" class="navigate-link">Create an Account</a></p> 
+            <p style="margin-top: 10px; font-size: 0.8rem;">
+                <a href="forgot.html" class="navigate-link" style="color: #481212; font-weight: 400;">Forgot Password?</a> 
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        
+        document.querySelectorAll('.navigate-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.body.classList.add('slide-left-exit');
+                setTimeout(() => {
+                    window.location.href = this.href;
+                }, 500); 
+            });
+        });
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            document.body.classList.add('slide-left-enter');
+        });
+    </script>
+
+</body>
+</html>
