@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoDoc Writer - Forgot Password</title>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css"> 
+</head>
+<body>
+
+    <div class="login-card">
+        <h1>Password Reset</h1>
+        <p class="subtitle">
+            Enter your email to receive a password reset link.
+        </p>
+
+        <form action="#">
+            <div class="input-group">
+                <input type="email" placeholder="Registered Email" required>
+            </div>
+            
+            <button type="button">Send Reset Link</button>
+        </form>
+
+        <div class="footer-links">
+            <p style="margin-top: 10px; font-size: 0.9rem;">
+                <a href="login.html" class="navigate-link">Back to Log In</a> 
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        
+        document.querySelectorAll('.navigate-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.body.classList.add('slide-left-exit');
+                setTimeout(() => {
+                    window.location.href = this.href;
+                }, 500); 
+            });
+        });
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            document.body.classList.add('slide-left-enter');
+        });
+    </script>
+
+</body>
+</html>
