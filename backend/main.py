@@ -3,8 +3,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import os
 
-from .auth import router as auth_router
-from .github_repos import router as repo_router
+try:
+    from .auth import router as auth_router
+    from .github_repos import router as repo_router
+except ImportError:
+    # Support both package and standalone imports
+    from auth import router as auth_router
+    from github_repos import router as repo_router
 
 # 1. Load Environment Variables
 load_dotenv()
@@ -12,6 +17,7 @@ load_dotenv()
 GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID")
 GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET")
 REDIRECT_URI = os.getenv("REDIRECT_URI", "http://localhost:8000/auth/callback")
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
 
 # 2. Initialize App
 app = FastAPI(title="AutoDoc Writer API", version="1.0.0")
@@ -19,7 +25,7 @@ app = FastAPI(title="AutoDoc Writer API", version="1.0.0")
 # 3. CORS Setup (Allow Frontend to talk to us)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # change for production
+    allow_origins=[FRONTEND_URL],  # Configurable via environment variable
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

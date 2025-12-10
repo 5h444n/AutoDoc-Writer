@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from github import Github
+from github import Github, Auth
 
 router = APIRouter()
 
@@ -9,7 +9,8 @@ def get_repos(access_token: str):
     Returns a list of GitHub repositories for the authenticated user.
     """
     try:
-        gh = Github(access_token)
+        auth = Auth.Token(access_token)
+        gh = Github(auth=auth)
         user = gh.get_user()
         repos = user.get_repos()
 
@@ -28,4 +29,6 @@ def get_repos(access_token: str):
         }
 
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        # Handle exceptions gracefully - avoid JSON serialization errors
+        error_msg = getattr(e, 'message', str(e))
+        raise HTTPException(status_code=400, detail=f"GitHub API error: {error_msg}")
