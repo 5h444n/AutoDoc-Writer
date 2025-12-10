@@ -64,8 +64,10 @@ class TestAuthentication:
         """Test /auth/login redirects to GitHub OAuth page"""
         response = client.get("/auth/login", follow_redirects=False)
         assert response.status_code == 307  # Redirect
-        assert "github.com" in response.headers["location"]
-        assert "client_id=test_client_id" in response.headers["location"]
+        location = response.headers["location"]
+        # Verify it's a GitHub OAuth URL with correct structure
+        assert location.startswith("https://github.com/login/oauth/authorize")
+        assert "client_id=test_client_id" in location
     
     def test_login_without_client_id(self):
         """Test login fails gracefully when GITHUB_CLIENT_ID is missing"""
