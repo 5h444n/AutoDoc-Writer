@@ -1,3 +1,0 @@
-"""
-AutoDoc Writer Backend Package
-"""

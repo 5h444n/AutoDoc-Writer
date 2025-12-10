@@ -8,3 +8,4 @@ google-generativeai
 pytest
 pytest-asyncio
 pytest-cov
+pydantic-settings
