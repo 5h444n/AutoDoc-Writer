@@ -3,7 +3,7 @@ import httpx
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import RedirectResponse
 from dotenv import load_dotenv
-from github import Github
+from github import Github, Auth
 
 # Load environment variables from .env
 load_dotenv()
@@ -77,7 +77,8 @@ async def callback(code: str):
 
     # --- Fetch GitHub Repos ---
     try:
-        gh = Github(access_token)
+        auth = Auth.Token(access_token)
+        gh = Github(auth=auth)
         user = gh.get_user()
         repos = user.get_repos()
 
