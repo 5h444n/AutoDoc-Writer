@@ -30,5 +30,5 @@ def get_repos(access_token: str):
 
     except Exception as e:
         # Handle exceptions gracefully - avoid JSON serialization errors
-        error_msg = str(e) if hasattr(e, '__str__') else type(e).__name__
+        error_msg = getattr(e, 'message', str(e))
         raise HTTPException(status_code=400, detail=f"GitHub API error: {error_msg}")

@@ -299,12 +299,14 @@ class TestSecurity:
     def test_sensitive_data_in_env_example(self):
         """Test that .env.example doesn't contain real secrets"""
         # BUG FOUND: .env.example contains actual GitHub credentials!
-        env_example_path = "/home/runner/work/AutoDoc-Writer/AutoDoc-Writer/.env.example"
+        import os
+        base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        env_example_path = os.path.join(base_path, ".env.example")
+        
         with open(env_example_path, 'r') as f:
             content = f.read()
-            # These look like real credentials
-            assert "Ov23li8Xv12JtpIeK9TM" not in content or True  # Flag for review
-            assert "138aa846c74d49df89edf1a3fa81d68a7549f79b" not in content or True
+            # These look like real credentials - should be placeholders
+            assert "your_github_client_id_here" in content or "placeholder" in content.lower()
 
 
 # --- Integration Tests ---
