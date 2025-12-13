@@ -1,3 +1,5 @@
-Figma or Sketch link attached to this ticket.
-Visual representation of "Active" vs "Inactive" repositories is clear.
-Frontend Lead has signed off on the complexity/feasibility.
+*sidebar
+*dashboard
+*document_viewer_plainText
+*document_viewer_research_style
+*document_viewer_LaTex
