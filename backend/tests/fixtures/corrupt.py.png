@@ -1,0 +1,7 @@
+PNG
+
+IHDR
+Sx	pHYs
+OIDATx^
+# This file pretends to be Python but contains binary garbage strings
+invalid_utf8 = "\x80\x81\xFF"

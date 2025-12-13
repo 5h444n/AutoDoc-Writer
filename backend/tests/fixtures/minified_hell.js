@@ -1,0 +1,2 @@
+// A single massive line of code
+function a(b,c){return b+c}var x=1,y=2,z=3;for(let i=0;i<9000;i++){x+=i;console.log(x)}if(x>100){y=x*2}else{y=x/2}document.body.innerHTML="<div>"+x+"</div>";window.alert("Done");
