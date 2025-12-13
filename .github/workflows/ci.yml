@@ -60,4 +60,5 @@ jobs:
       run: |
         pip install flake8
         # Stop the build if there are Python syntax errors
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # Exclude tests/fixtures as they contain intentionally broken code for testing
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=tests/fixtures
