@@ -9,3 +9,6 @@ class User(Base):
     github_username = Column(String, unique=True, index=True)
     access_token = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+    # --- ADD THIS LINE --- TANIM
+    repos = relationship("Repository", back_populates="owner")
