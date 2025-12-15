@@ -65,8 +65,10 @@ class GitHubService:
         
         response = requests.get(url, headers=headers, params=params)
         if response.status_code != 200:
-            raise HTTPException(status_code=400, detail="Failed to fetch repositories")
-            
+            raise HTTPException(
+                status_code=400,
+                detail=f"Failed to fetch repositories: status_code={response.status_code}, response={response.text}"
+            )
         # Return a simplified list of dicts
         repos = response.json()
         return [
