@@ -1,5 +1,6 @@
 import google.generativeai as genai
 import os
+import threading
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from dotenv import load_dotenv
@@ -17,38 +18,46 @@ else:
 
 # Module-level cache for discovered model name
 _cached_model_name = None
+_model_lock = threading.Lock()
 
 def _discover_model():
     """
     Discovers and caches the best available Gemini model.
     This function is called once and the result is cached.
+    Thread-safe implementation using a lock.
     """
     global _cached_model_name
     
+    # Quick check without lock (double-checked locking pattern)
     if _cached_model_name is not None:
         return _cached_model_name
     
-    # 1. Ask Google which models are available for this specific API Key
-    all_models = list(genai.list_models())
-    
-    # 2. Filter for models that can generate content (text)
-    valid_models = [
-        m.name for m in all_models 
-        if 'generateContent' in m.supported_generation_methods
-    ]
-    
-    if not valid_models:
-        raise HTTPException(status_code=500, detail="Your API Key has no access to any AI models. Check Google AI Studio.")
-    
-    # 3. Smart Selection: Prefer 'flash', then 'pro', then whatever is left
-    chosen_model_name = next((m for m in valid_models if 'flash' in m), None)
-    if not chosen_model_name:
-        chosen_model_name = next((m for m in valid_models if 'pro' in m), valid_models[0])
-    
-    print(f"🤖 Server selected model: {chosen_model_name}") # This prints to your terminal so you know what worked
-    
-    _cached_model_name = chosen_model_name
-    return _cached_model_name
+    with _model_lock:
+        # Check again after acquiring lock
+        if _cached_model_name is not None:
+            return _cached_model_name
+        
+        # 1. Ask Google which models are available for this specific API Key
+        all_models = list(genai.list_models())
+        
+        # 2. Filter for models that can generate content (text)
+        valid_models = [
+            m.name for m in all_models 
+            if 'generateContent' in m.supported_generation_methods
+        ]
+        
+        if not valid_models:
+            raise HTTPException(status_code=500, detail="Your API Key has no access to any AI models. Check Google AI Studio.")
+        
+        # 3. Smart Selection: Prefer 'flash', then 'pro', then whatever is left
+        chosen_model_name = next((m for m in valid_models if 'flash' in m), None)
+        if not chosen_model_name:
+            chosen_model_name = next((m for m in valid_models if 'pro' in m), valid_models[0])
+        
+        print(f"🤖 Server selected model: {chosen_model_name}") # This prints to your terminal so you know what worked
+        
+        _cached_model_name = chosen_model_name
+        return _cached_model_name
 
 # 2. Define Input Model
 class GenerateReq(BaseModel):
