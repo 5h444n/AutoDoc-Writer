@@ -37,8 +37,13 @@ def callback(code: str, db: Session = Depends(get_db)):
     # 3. Find or Create User in Database
     user = db.query(User).filter(User.github_username == gh_username).first()
     if not user:
-        user = User(github_username=gh_username)
+        user = User(github_username=gh_username, access_token=token)
         db.add(user)
+        db.commit()
+        db.refresh(user)
+    else:
+        # Update the access token for existing users
+        user.access_token = token
         db.commit()
         db.refresh(user)
 
