@@ -5,6 +5,7 @@ from cryptography.fernet import Fernet
 from app.core.config import settings
 import base64
 import hashlib
+from typing import Optional
 
 
 def get_encryption_key() -> bytes:
@@ -20,15 +21,15 @@ def get_encryption_key() -> bytes:
     return base64.urlsafe_b64encode(key)
 
 
-def encrypt_token(token: str) -> str:
+def encrypt_token(token: Optional[str]) -> Optional[str]:
     """
     Encrypts a token using Fernet symmetric encryption.
     
     Args:
-        token: The plaintext token to encrypt.
+        token: The plaintext token to encrypt, or None.
         
     Returns:
-        str: The encrypted token as a string.
+        The encrypted token as a string, or None if input was None/empty.
     """
     if not token:
         return token
@@ -38,15 +39,15 @@ def encrypt_token(token: str) -> str:
     return encrypted.decode()
 
 
-def decrypt_token(encrypted_token: str) -> str:
+def decrypt_token(encrypted_token: Optional[str]) -> Optional[str]:
     """
     Decrypts a token that was encrypted with encrypt_token.
     
     Args:
-        encrypted_token: The encrypted token string.
+        encrypted_token: The encrypted token string, or None.
         
     Returns:
-        str: The decrypted plaintext token.
+        The decrypted plaintext token, or None if input was None/empty.
     """
     if not encrypted_token:
         return encrypted_token
