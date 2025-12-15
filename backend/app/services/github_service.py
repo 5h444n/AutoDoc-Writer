@@ -63,19 +63,28 @@ class GitHubService:
         }
         params = {"sort": "updated", "per_page": 100}
         
-        response = requests.get(url, headers=headers, params=params)
-        if response.status_code != 200:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Failed to fetch repositories: status_code={response.status_code}, response={response.text}"
-            )
+        per_page = 100
+        params = {"sort": "updated", "per_page": per_page, "page": 1}
+        
+        all_repos = []
+        while True:
+            response = requests.get(url, headers=headers, params=params)
+            if response.status_code != 200:
+                raise HTTPException(status_code=400, detail="Failed to fetch repositories")
+            repos = response.json()
+            if not repos:
+                break
+            all_repos.extend(repos)
+            if len(repos) < per_page:
+                break
+            params["page"] += 1
+        
         # Return a simplified list of dicts
-        repos = response.json()
         return [
             {
                 "name": repo["name"],
                 "url": repo["html_url"],
                 "last_updated": repo["updated_at"]
             }
-            for repo in repos
+            for repo in all_repos
         ]
