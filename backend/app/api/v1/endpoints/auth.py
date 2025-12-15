@@ -39,13 +39,13 @@ def callback(code: str, db: Session = Depends(get_db)):
     if not user:
         user = User(github_username=gh_username, access_token=token)
         db.add(user)
-        db.commit()
-        db.refresh(user)
     else:
         # Update the access token for existing users
         user.access_token = token
-        db.commit()
-        db.refresh(user)
+    
+    # Commit user changes before fetching repos (need user.id)
+    db.commit()
+    db.refresh(user)
 
     # 4. Fetch Repos from GitHub
     repos = GitHubService.get_user_repos(token)
