@@ -15,6 +15,41 @@ if not api_key:
 else:
     genai.configure(api_key=api_key)
 
+# Module-level cache for discovered model name
+_cached_model_name = None
+
+def _discover_model():
+    """
+    Discovers and caches the best available Gemini model.
+    This function is called once and the result is cached.
+    """
+    global _cached_model_name
+    
+    if _cached_model_name is not None:
+        return _cached_model_name
+    
+    # 1. Ask Google which models are available for this specific API Key
+    all_models = list(genai.list_models())
+    
+    # 2. Filter for models that can generate content (text)
+    valid_models = [
+        m.name for m in all_models 
+        if 'generateContent' in m.supported_generation_methods
+    ]
+    
+    if not valid_models:
+        raise HTTPException(status_code=500, detail="Your API Key has no access to any AI models. Check Google AI Studio.")
+    
+    # 3. Smart Selection: Prefer 'flash', then 'pro', then whatever is left
+    chosen_model_name = next((m for m in valid_models if 'flash' in m), None)
+    if not chosen_model_name:
+        chosen_model_name = next((m for m in valid_models if 'pro' in m), valid_models[0])
+    
+    print(f"🤖 Server selected model: {chosen_model_name}") # This prints to your terminal so you know what worked
+    
+    _cached_model_name = chosen_model_name
+    return _cached_model_name
+
 # 2. Define Input Model
 class GenerateReq(BaseModel):
     code: str
@@ -30,29 +65,11 @@ async def generate_preview(request: GenerateReq):
         raise HTTPException(status_code=500, detail="Server Error: GEMINI_API_KEY is missing.")
 
     try:
-        # --- AUTO-DISCOVERY LOGIC (The Fix) ---
-        # 1. Ask Google which models are available for this specific API Key
-        all_models = list(genai.list_models())
+        # Use cached model discovery
+        chosen_model_name = _discover_model()
         
-        # 2. Filter for models that can generate content (text)
-        valid_models = [
-            m.name for m in all_models 
-            if 'generateContent' in m.supported_generation_methods
-        ]
-        
-        if not valid_models:
-             raise HTTPException(status_code=500, detail="Your API Key has no access to any AI models. Check Google AI Studio.")
-
-        # 3. Smart Selection: Prefer 'flash', then 'pro', then whatever is left
-        chosen_model_name = next((m for m in valid_models if 'flash' in m), None)
-        if not chosen_model_name:
-            chosen_model_name = next((m for m in valid_models if 'pro' in m), valid_models[0])
-
-        print(f"🤖 Server selected model: {chosen_model_name}") # This prints to your terminal so you know what worked
-        
-        # 4. Initialize the chosen model
+        # Initialize the chosen model
         model = genai.GenerativeModel(chosen_model_name)
-        # -------------------------------------
 
         system_instruction = "You are an expert technical writer."
         if request.style == "latex":
