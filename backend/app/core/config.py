@@ -14,6 +14,10 @@ class Settings(BaseSettings):
     # --- Security ---
     SECRET_KEY: str = "change_this_in_production"
 
+    # --- GitHub URLs -----------------ADDED THIS PART TANIM
+    GITHUB_AUTH_URL: str = "https://github.com/login/oauth/authorize"
+    GITHUB_TOKEN_URL: str = "https://github.com/login/oauth/access_token"
+
     # --- GitHub OAuth ---
     GITHUB_CLIENT_ID: str
     GITHUB_CLIENT_SECRET: str

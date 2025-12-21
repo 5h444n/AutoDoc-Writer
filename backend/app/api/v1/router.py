@@ -1,7 +1,13 @@
 from fastapi import APIRouter
-from app.api.v1.endpoints import repos, auth
-# Note: You'll need to move your auth logic to endpoints/auth.py similarly
+from app.api.v1.endpoints import auth, repos, ai
 
 api_router = APIRouter()
-api_router.include_router(repos.router, prefix="/repos", tags=["repos"])
-# api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
+
+# 1. Connect Auth (This creates /api/v1/auth/...)
+api_router.include_router(auth.router, prefix="/auth", tags=["Authentication"])
+
+# 2. Connect Repos (This creates /api/v1/repos/...)
+api_router.include_router(repos.router, prefix="/repos", tags=["Repositories"])
+
+# 3. Connect AI (This creates /api/v1/ai/...)
+api_router.include_router(ai.router, prefix="/ai", tags=["AI"])

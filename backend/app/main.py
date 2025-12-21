@@ -10,9 +10,17 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title=settings.PROJECT_NAME)
 
+# [Roadmap Step 8] Enable CORS for Frontend
+# We explicitly add localhost:3000 (React) and localhost:5173 (Vite/Next.js)
+origins = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://localhost:8000",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.BACKEND_CORS_ORIGINS,
+    allow_origins=origins,  # Explicit list is safer for dev
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
