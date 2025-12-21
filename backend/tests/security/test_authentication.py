@@ -28,14 +28,19 @@ class TestAuthenticationSecurity:
         # Assert
         assert response.status_code in [400, 401]
 
-    @patch('app.services.github_service.GitHubService.get_user_repos')
-    def test_repos_endpoint_with_valid_token(self, mock_get_repos, client):
+    def test_repos_endpoint_with_valid_token(self, client, test_db):
         """Test that repos endpoint accepts valid token."""
-        # Arrange
-        mock_get_repos.return_value = []
+        # Arrange - Create a user with a valid token
+        from app.models.user import User
+        user = User(github_username="testuser", access_token="valid_token_12345")
+        test_db.add(user)
+        test_db.commit()
         
-        # Act
-        response = client.get("/api/v1/repos/?access_token=valid_token_12345")
+        # Act - Use Bearer token in Authorization header
+        response = client.get(
+            "/api/v1/repos/",
+            headers={"Authorization": "Bearer valid_token_12345"}
+        )
         
         # Assert
         assert response.status_code == 200
@@ -51,7 +56,10 @@ class TestAuthenticationSecurity:
         ]
         
         for token in invalid_tokens:
-            response = client.get(f"/api/v1/repos/?access_token={token}")
+            response = client.get(
+                "/api/v1/repos/",
+                headers={"Authorization": f"Bearer {token}"}
+            )
             # Should either reject or handle gracefully
             assert response.status_code in [400, 401, 422] or "error" in response.json().get("detail", "").lower()
 
@@ -142,8 +150,11 @@ class TestInputValidation:
     ])
     def test_rejects_malicious_input(self, client, malicious_input):
         """Test that malicious input is rejected or sanitized."""
-        # Try to use malicious input in access_token
-        response = client.get(f"/api/v1/repos/?access_token={malicious_input}")
+        # Try to use malicious input in Bearer token
+        response = client.get(
+            "/api/v1/repos/",
+            headers={"Authorization": f"Bearer {malicious_input}"}
+        )
         
         # Should either reject the input or handle it safely
         # Not crash or execute the malicious code

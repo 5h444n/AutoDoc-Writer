@@ -43,6 +43,7 @@ def callback(code: str, db: Session = Depends(get_db)):
         # Update the access token for existing users
         user.access_token = token
     
+    # Commit user changes before fetching repos (need user.id)
     db.commit()
     db.refresh(user)
 
