@@ -49,7 +49,14 @@ class GitHubService:
         
         response = requests.get(url, headers=headers)
         if response.status_code != 200:
-            raise HTTPException(status_code=400, detail="Failed to fetch user profile")
+            try:
+                error_detail = response.json().get("message", response.text)
+            except Exception:
+                error_detail = response.text
+            raise HTTPException(
+                status_code=400,
+                detail=f"Failed to fetch user profile: HTTP {response.status_code} - {error_detail}"
+            )
             
         return response.json().get("login")
 

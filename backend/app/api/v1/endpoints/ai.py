@@ -76,4 +76,4 @@ async def generate_preview(request: GenerateReq):
 
     except Exception as e:
         print(f"❌ AI Error: {e}") # Check your terminal for this if it fails
-        raise HTTPException(status_code=500, detail=f"AI Service Error: {str(e)}")
+        raise HTTPException(status_code=500, detail="AI Service Error. Please try again later.")
