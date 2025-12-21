@@ -4,7 +4,7 @@ from app.db.session import get_db
 from app.models.repository import Repository
 from app.models.user import User
 from app.schemas.repo import RepoResponse, RepoToggleRequest
-from app.core.security import get_current_user
+from app.core.auth import get_current_user
 
 router = APIRouter()
 

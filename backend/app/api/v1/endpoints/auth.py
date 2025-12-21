@@ -26,7 +26,7 @@ def callback(code: str, db: Session = Depends(get_db)):
     try:
         token = GitHubService.exchange_code_for_token(code)
     except Exception as e:
-         raise HTTPException(status_code=400, detail=f"Token Exchange Failed: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Token Exchange Failed: {str(e)}")
     
     # 2. Get GitHub Username
     gh_username = GitHubService.get_user_profile(token)
@@ -54,15 +54,15 @@ def callback(code: str, db: Session = Depends(get_db)):
     for repo_data in repos:
         # Check if repo already exists
         existing_repo = db.query(Repository).filter(
-            Repository.name == repo_data["name"],  # Fixed: uses ["name"]
+            Repository.name == repo_data["name"],
             Repository.owner_id == user.id
         ).first()
 
         if not existing_repo:
             new_repo = Repository(
-                name=repo_data["name"],       # Fixed
+                name=repo_data["name"],
                 url=repo_data["url"], 
-                last_updated=repo_data["last_updated"],  # <--- ADD THIS LINE        # Fixed
+                last_updated=repo_data["last_updated"],
                 owner_id=user.id
             )
             db.add(new_repo)
