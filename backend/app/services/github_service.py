@@ -68,7 +68,6 @@ class GitHubService:
             "Authorization": f"Bearer {access_token}",
             "Accept": "application/json"
         }
-        params = {"sort": "updated", "per_page": 100}
         
         per_page = 100
         params = {"sort": "updated", "per_page": per_page, "page": 1}
