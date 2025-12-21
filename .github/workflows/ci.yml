@@ -34,7 +34,6 @@ jobs:
 
     - name: Run ESLint
       run: npm run lint
-      continue-on-error: true  # Don't fail the build on linting errors for now
 
     - name: Type Check with TypeScript
       run: npx tsc --noEmit
@@ -180,8 +179,7 @@ jobs:
     - name: Run CodeQL Analysis
       uses: github/codeql-action/init@v3
       with:
-        languages: python, javascript
-      continue-on-error: true
+        languages: python, typescript
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
