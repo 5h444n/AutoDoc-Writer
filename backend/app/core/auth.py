@@ -31,7 +31,8 @@ def get_current_user(
     Raises:
         HTTPException: If token is invalid or user not found
     """
-    # Import here to avoid circular dependency
+    # Import here to avoid circular dependency with app.models.user
+    # TODO: Refactor architecture to eliminate this circular dependency
     from app.models.user import User
     
     if not credentials:
