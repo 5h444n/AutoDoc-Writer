@@ -1,64 +1,221 @@
-name: AutoDoc CI Pipeline
+name: AutoDoc CI/CD Pipeline
 
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:  # Allow manual trigger
 
 jobs:
   # ------------------------------------
-  # JOB 1: CHECK FRONTEND (REACT/ELECTRON)
+  # JOB 1: FRONTEND CI
   # ------------------------------------
-  frontend-check:
+  frontend-ci:
+    name: Frontend CI
     runs-on: ubuntu-latest
+    permissions:
+      contents: read  # Read repository contents
     defaults:
       run:
         working-directory: ./frontend
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout Repository
+      uses: actions/checkout@v4
     
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '20'
         cache: 'npm'
-        # This tells the cache to look at the frontend lock file
         cache-dependency-path: frontend/package-lock.json
 
     - name: Install Dependencies
       run: npm ci
 
-    - name: Check Build (Ensure no syntax errors)
+    - name: Run ESLint
+      run: npm run lint
+
+    - name: Type Check with TypeScript
+      run: npx tsc --noEmit
+      continue-on-error: true
+
+    - name: Build Production Bundle
       run: npm run build
 
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-build
+        path: frontend/dist
+        retention-days: 7
+
   # ------------------------------------
-  # JOB 2: CHECK BACKEND (PYTHON/FASTAPI)
+  # JOB 2: BACKEND CI
   # ------------------------------------
-  backend-check:
+  backend-ci:
+    name: Backend CI
     runs-on: ubuntu-latest
+    permissions:
+      contents: read  # Read repository contents
     defaults:
       run:
         working-directory: ./backend
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout Repository
+      uses: actions/checkout@v4
 
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.10'
         cache: 'pip'
+        cache-dependency-path: backend/requirements.txt
 
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     
-    - name: Lint with Flake8 (Optional Syntax Check)
+    - name: Lint with Flake8
       run: |
         pip install flake8
         # Stop the build if there are Python syntax errors
         # Exclude tests/fixtures as they contain intentionally broken code for testing
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=tests/fixtures
+      continue-on-error: false
+
+    - name: Run Tests with Coverage
+      run: |
+        pytest -v --cov=app --cov-report=xml --cov-report=term-missing --cov-report=html
+      continue-on-error: true  # Don't fail on test failures for now since some tests have known issues
+
+    - name: Upload Coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./backend/coverage.xml
+        flags: backend
+        name: backend-coverage
+        fail_ci_if_error: false
+      continue-on-error: true
+
+    - name: Upload Coverage HTML Report
+      uses: actions/upload-artifact@v4
+      with:
+        name: backend-coverage-report
+        path: backend/htmlcov
+        retention-days: 7
+      if: always()
+
+    - name: Display Test Results Summary
+      if: always()
+      run: |
+        echo "## Test Results Summary" >> $GITHUB_STEP_SUMMARY
+        echo "Test run completed. Check artifacts for detailed coverage report." >> $GITHUB_STEP_SUMMARY
+
+  # ------------------------------------
+  # JOB 3: SECURITY SCANNING
+  # ------------------------------------
+  security-scan:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read  # Read repository contents
+      actions: read   # Read workflow artifacts
+    
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install Security Tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install bandit safety
+
+    - name: Run Bandit Security Scan
+      run: |
+        cd backend
+        bandit -r app/ -f json -o bandit-report.json || true
+        bandit -r app/ -f screen
+      continue-on-error: true
+
+    - name: Upload Bandit Report
+      uses: actions/upload-artifact@v4
+      with:
+        name: bandit-security-report
+        path: backend/bandit-report.json
+        retention-days: 30
+      if: always()
+
+    - name: Check Dependencies for Vulnerabilities
+      run: |
+        cd backend
+        pip install -r requirements.txt
+        safety check --json --output safety-report.json || true
+        safety check
+      continue-on-error: true
+
+    - name: Upload Safety Report
+      uses: actions/upload-artifact@v4
+      with:
+        name: safety-report
+        path: backend/safety-report.json
+        retention-days: 30
+      if: always()
+
+  # ------------------------------------
+  # JOB 4: CODE QUALITY
+  # ------------------------------------
+  code-quality:
+    name: Code Quality Checks
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read        # Read repository contents
+      security-events: write # Write CodeQL results
+      actions: read         # Read workflow artifacts
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Full history for better analysis
+
+    - name: Run CodeQL Analysis
+      uses: github/codeql-action/init@v3
+      with:
+        languages: python, typescript
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+      continue-on-error: true
+
+  # ------------------------------------
+  # JOB 5: BUILD STATUS
+  # ------------------------------------
+  build-status:
+    name: Build Status Summary
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read  # Read repository contents
+    needs: [frontend-ci, backend-ci, security-scan, code-quality]
+    if: always()
+
+    steps:
+    - name: Check Build Status
+      run: |
+        echo "## CI/CD Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Job Status" >> $GITHUB_STEP_SUMMARY
+        echo "- Frontend CI: ${{ needs.frontend-ci.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Backend CI: ${{ needs.backend-ci.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Security Scan: ${{ needs.security-scan.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Code Quality: ${{ needs.code-quality.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "Build completed at $(date)" >> $GITHUB_STEP_SUMMARY

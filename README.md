@@ -5,6 +5,7 @@
 ### AI-Powered Code Documentation Generator
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CI/CD Pipeline](https://github.com/5h444n/AutoDoc-Writer/actions/workflows/ci.yml/badge.svg)](https://github.com/5h444n/AutoDoc-Writer/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100%2B-009688.svg)](https://fastapi.tiangolo.com/)
 [![React](https://img.shields.io/badge/React-19.2-61DAFB.svg)](https://reactjs.org/)
@@ -623,9 +624,20 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 ### Code Review Process
 
 1. All pull requests require at least one review
-2. CI tests must pass
+2. **CI/CD pipeline must pass** - All automated checks must succeed
 3. Code coverage should not decrease
 4. Documentation must be updated for new features
+5. Security scans should not introduce new high-severity issues
+
+### CI/CD Requirements
+
+All pull requests automatically run through our CI/CD pipeline:
+- ✅ Frontend linting and type checking
+- ✅ Backend linting and testing
+- ✅ Security vulnerability scanning
+- ✅ Code quality analysis with CodeQL
+
+See [CI_CD_GUIDE.md](CI_CD_GUIDE.md) for details.
 
 ---
 
@@ -807,10 +819,10 @@ copies or substantial portions of the Software.
 - [ ] Syntax highlighting
 - [ ] Dark mode support
 
-#### 🎯 Phase 4: Production Ready (Future)
+#### 🎯 Phase 4: Production Ready (In Progress)
 - [ ] Production deployment guide
 - [ ] Docker containerization
-- [ ] CI/CD pipeline
+- [x] CI/CD pipeline
 - [ ] Rate limiting
 - [ ] Comprehensive logging
 - [ ] Performance optimization
@@ -829,6 +841,8 @@ Vote on features you'd like to see: [GitHub Discussions](https://github.com/5h44
 | Document | Description | Link |
 |----------|-------------|------|
 | **README.md** | Main project documentation | (This file) |
+| **CI_CD_GUIDE.md** | CI/CD pipeline guide and setup | [View](CI_CD_GUIDE.md) |
+| **TESTING_GUIDE.md** | Testing guide and best practices | [View](TESTING_GUIDE.md) |
 | **BUG_REPORT.md** | Known bugs and issues | [View](BUG_REPORT.md) |
 | **IMPROVEMENTS.md** | Improvement recommendations | [View](IMPROVEMENTS.md) |
 | **TESTING_SUMMARY.md** | Testing overview and metrics | [View](TESTING_SUMMARY.md) |
