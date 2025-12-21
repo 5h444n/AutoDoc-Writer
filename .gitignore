@@ -72,6 +72,12 @@ wheels/
 .pytest_cache/
 .coverage
 htmlcov/
+coverage.xml
+.coverage.*
+
+# Security scan reports
+bandit-report.json
+safety-report.json
 
 # Environment Variables (Secrets)
 # SECURITY RISK: Never commit these!
