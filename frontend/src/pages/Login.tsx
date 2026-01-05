@@ -1,69 +1,81 @@
 import { useState } from "react";
 import { Button } from "../components/ui/Button";
-
-// GitHub SVG Icon (Inline for zero-dependency)
-const GitHubIcon = () => (
-  <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
-  </svg>
-);
+import { Github, Bot, Sparkles } from "lucide-react";
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = () => {
     setIsLoading(true);
-    // Simulate network delay to demonstrate UI state
     setTimeout(() => setIsLoading(false), 2000);
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gray-50 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
-      <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl border border-gray-100 animate-in fade-in zoom-in duration-500">
-        
-        {/* Branding Header */}
-        <div className="text-center mb-10">
-          <div className="h-12 w-12 bg-slate-900 rounded-xl mx-auto flex items-center justify-center mb-4 shadow-lg shadow-slate-900/20 group cursor-default">
-            <span className="text-white font-bold text-xl group-hover:scale-110 transition-transform">AD</span>
-          </div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 mb-2">
-            Welcome back
-          </h1>
-          <p className="text-sm text-slate-500 px-8">
-            Sign in to AutoDoc Writer to generate documentation for your repositories.
-          </p>
-        </div>
+    <div className="relative min-h-screen w-full flex items-center justify-center bg-[#0f172a] overflow-hidden">
+      
+      {/* --- Dynamic Background Animation --- */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute -bottom-32 left-1/3 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+      </div>
 
-        {/* Login Actions */}
-        <div className="space-y-6">
-          <Button 
-            onClick={handleLogin} 
-            isLoading={isLoading} 
-            className="w-full h-12 text-base shadow-sm"
-          >
-            {!isLoading && <GitHubIcon />}
-            Continue with GitHub
-          </Button>
+      {/* --- Glassmorphism Card --- */}
+      <div className="relative z-10 w-full max-w-[420px] mx-4 animate-fade-in">
+        <div className="relative group rounded-2xl bg-gradient-to-b from-white/10 to-white/5 p-[1px] shadow-2xl backdrop-blur-xl">
           
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-gray-200" />
+          <div className="bg-[#0f172a]/80 backdrop-blur-xl rounded-2xl p-8 sm:p-10 border border-white/10">
+            
+            {/* BRANDING SECTION */}
+            <div className="flex flex-col items-center mb-10">
+              {/* Logo Icon Container */}
+              <div className="relative h-16 w-16 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg mb-6 group-hover:scale-105 transition-transform duration-300">
+                {/* Replaced 'AD' with a Bot Icon */}
+                <Bot className="h-8 w-8 text-white" />
+                
+                {/* Tiny sparkle accent */}
+                <div className="absolute -top-2 -right-2 bg-white rounded-full p-1 shadow-md">
+                   <Sparkles className="h-3 w-3 text-purple-600" />
+                </div>
+              </div>
+              
+              {/* Full Name */}
+              <h1 className="text-3xl font-bold text-white tracking-tight mb-2">
+                AutoDoc Writer
+              </h1>
+              <p className="text-slate-400 text-sm text-center max-w-[260px]">
+                Intelligent documentation generation for your engineering team.
+              </p>
             </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-slate-400 font-medium">
-                Secure Authentication
-              </span>
+
+            {/* ACTION SECTION */}
+            <div className="space-y-6">
+              <Button onClick={handleLogin} isLoading={isLoading}>
+                {!isLoading && <Github className="h-5 w-5" />}
+                <span>Continue with GitHub</span>
+              </Button>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-white/10" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-[#0f172a] px-2 text-slate-500">
+                    Secure Access
+                  </span>
+                </div>
+              </div>
             </div>
+            
+            {/* FOOTER */}
+            <p className="mt-8 text-center text-xs text-slate-500">
+              By clicking continue, you agree to our{" "}
+              <a href="#" className="text-indigo-400 hover:text-indigo-300 transition-colors hover:underline">Terms</a>
+              {" "}and{" "}
+              <a href="#" className="text-indigo-400 hover:text-indigo-300 transition-colors hover:underline">Privacy Policy</a>.
+            </p>
           </div>
         </div>
-
-        {/* Legal Footer */}
-        <p className="mt-8 text-center text-xs text-slate-400">
-          By continuing, you agree to our{" "}
-          <a href="#" className="underline decoration-slate-300 underline-offset-4 hover:text-slate-900 hover:decoration-slate-900 transition-all">Terms</a>{" "}
-          and{" "}
-          <a href="#" className="underline decoration-slate-300 underline-offset-4 hover:text-slate-900 hover:decoration-slate-900 transition-all">Privacy Policy</a>.
-        </p>
       </div>
     </div>
   );

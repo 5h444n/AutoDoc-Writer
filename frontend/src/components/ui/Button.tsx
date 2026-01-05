@@ -3,41 +3,45 @@ import { Loader2 } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-// Utility for merging tailwind classes safely
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   isLoading?: boolean;
-  variant?: "primary" | "outline" | "ghost";
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, children, isLoading, variant = "primary", disabled, ...props }, ref) => {
-    
-    // Base styles: Focus rings, transitions, centering
-    const baseStyles = "inline-flex items-center justify-center rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-white";
-    
-    // Color Variants
-    const variants = {
-      primary: "bg-slate-900 text-white hover:bg-slate-800 active:bg-slate-950",
-      outline: "border border-slate-200 bg-transparent hover:bg-slate-100 hover:text-slate-900",
-      ghost: "hover:bg-slate-100 hover:text-slate-900",
-    };
-
+  ({ className, children, isLoading, disabled, ...props }, ref) => {
     return (
       <button
         ref={ref}
-        className={cn(baseStyles, variants[variant], "h-11 px-8", className)}
         disabled={isLoading || disabled}
+        className={cn(
+          // Layout & Centering (FIXED HERE)
+          "relative flex w-full items-center justify-center gap-2", 
+          "text-center align-middle",
+          
+          // Sizing & Shape
+          "rounded-xl py-3.5 px-8 text-sm font-semibold",
+          
+          // Visuals (Colors & Shadows)
+          "text-white transition-all duration-300",
+          "bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500",
+          "shadow-[0_0_20px_rgba(99,102,241,0.5)] hover:shadow-[0_0_30px_rgba(99,102,241,0.7)]",
+          
+          // States
+          "disabled:opacity-50 disabled:cursor-not-allowed",
+          "active:scale-[0.98]",
+          
+          className
+        )}
         {...props}
       >
-        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        {isLoading && <Loader2 className="h-4 w-4 animate-spin text-white" />}
         {children}
       </button>
     );
   }
 );
-
 Button.displayName = "Button";
