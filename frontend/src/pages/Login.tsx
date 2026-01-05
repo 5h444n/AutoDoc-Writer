@@ -76,9 +76,9 @@ export default function LoginPage() {
             {/* FOOTER */}
             <p className="mt-8 text-center text-xs text-slate-500">
               By clicking continue, you agree to our{" "}
-              <a href="#" className="text-indigo-400 hover:text-indigo-300 transition-colors hover:underline">Terms</a>
+              <a href="#terms" className="text-indigo-400 hover:text-indigo-300 transition-colors hover:underline">Terms</a>
               {" "}and{" "}
-              <a href="#" className="text-indigo-400 hover:text-indigo-300 transition-colors hover:underline">Privacy Policy</a>.
+              <a href="#privacy" className="text-indigo-400 hover:text-indigo-300 transition-colors hover:underline">Privacy Policy</a>.
             </p>
           </div>
         </div>
