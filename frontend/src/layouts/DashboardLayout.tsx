@@ -31,7 +31,10 @@ export default function DashboardLayout() {
             </div>
 
             {/* Notification Bell */}
-            <button className="relative rounded-full p-2 text-slate-400 hover:bg-white/5 hover:text-white transition-colors">
+            <button
+              aria-label="Notifications"
+              className="relative rounded-full p-2 text-slate-400 hover:bg-white/5 hover:text-white transition-colors"
+            >
               <Bell className="h-5 w-5" />
               <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-red-500 ring-2 ring-[#020617]" />
             </button>
