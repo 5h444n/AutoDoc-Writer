@@ -72,5 +72,6 @@ def callback(code: str, db: Session = Depends(get_db)):
     return {
         "message": "Login successful",
         "username": user.github_username,
+        "access_token": user.access_token,
         "repos_synced": len(repos)
     }

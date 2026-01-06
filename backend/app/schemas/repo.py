@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import List
+from datetime import datetime
 
 class RepoBase(BaseModel):
     name: str
@@ -16,3 +17,10 @@ class RepoResponse(BaseModel):
 
 class RepoToggleRequest(BaseModel):
     is_active: bool
+
+class CommitInfo(BaseModel):
+    sha: str
+    message: str
+    author_name: str
+    date: datetime
+    url: str

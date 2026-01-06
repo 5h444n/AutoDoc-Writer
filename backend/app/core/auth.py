@@ -32,7 +32,6 @@ def get_current_user(
         HTTPException: If token is invalid or user not found
     """
     # Import here to avoid circular dependency with app.models.user
-    # TODO: Refactor architecture to eliminate this circular dependency
     from app.models.user import User
     
     if not credentials:
@@ -44,8 +43,19 @@ def get_current_user(
     
     token = credentials.credentials
     
-    # Find user by access token
-    user = db.query(User).filter(User.access_token == token).first()
+    # ---------------------------------------------------------
+    # FIX: Search in Python instead of SQL
+    # (Because the DB cannot decrypt the data to compare it)
+    # ---------------------------------------------------------
+    users = db.query(User).all()
+    
+    user = None
+    for u in users:
+        # u.access_token automatically decrypts the key for us here
+        if u.access_token == token:
+            user = u
+            break
+    # ---------------------------------------------------------
     
     if not user:
         raise HTTPException(

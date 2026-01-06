@@ -3,8 +3,10 @@ from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.models.repository import Repository
 from app.models.user import User
-from app.schemas.repo import RepoResponse, RepoToggleRequest
+from app.schemas.repo import RepoResponse, RepoToggleRequest, CommitInfo 
 from app.core.auth import get_current_user
+from app.services.github_service import GitHubService
+from typing import List
 
 router = APIRouter()
 
@@ -49,3 +51,17 @@ def toggle_repo_monitoring(
     db.refresh(repo)
     
     return {"status": "success", "repo": repo.name, "is_active": repo.is_active}
+
+@router.get("/{repo_name}/commits", response_model=List[CommitInfo])
+async def get_repo_commits(
+    repo_name: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Fetches the last 5 commits for the selected repository.
+    """
+    service = GitHubService(db)
+    # Call the new function we wrote in Step 3
+    commits = await service.get_commits(current_user, repo_name)
+    return commits
