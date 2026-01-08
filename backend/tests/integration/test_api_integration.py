@@ -18,7 +18,8 @@ class TestReposEndpointIntegration:
         from app.models.user import User
         from app.models.repository import Repository
         
-        user = User(github_username="testuser", access_token="test_token")
+        user = User(github_username="testuser")
+        user.access_token = "test_token"
         test_db.add(user)
         test_db.commit()
         test_db.refresh(user)
@@ -70,7 +71,8 @@ class TestReposEndpointIntegration:
         # Arrange - Create a user with no repos
         from app.models.user import User
         
-        user = User(github_username="testuser", access_token="test_token")
+        user = User(github_username="testuser")
+        user.access_token = "test_token"
         test_db.add(user)
         test_db.commit()
         
@@ -122,10 +124,8 @@ class TestDatabaseIntegration:
         """Test that User model can be created."""
         from app.models.user import User
         
-        user = User(
-            github_username="testuser",
-            access_token="test_token_123"
-        )
+        user = User(github_username="testuser")
+        user.access_token = "test_token_123"
         test_db.add(user)
         test_db.commit()
         
@@ -210,7 +210,8 @@ class TestEndToEndFlow:
         from app.models.user import User
         from app.models.repository import Repository
         
-        user = User(github_username="testuser", access_token="test_token_123")
+        user = User(github_username="testuser")
+        user.access_token = "test_token_123"
         test_db.add(user)
         test_db.commit()
         test_db.refresh(user)

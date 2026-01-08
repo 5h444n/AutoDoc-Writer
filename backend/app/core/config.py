@@ -43,5 +43,8 @@ class Settings(BaseSettings):
 
         # Ensure variable names match exactly (e.g., GITHUB_CLIENT_ID, not github_client_id)
         case_sensitive = True
+        
+        # Make settings immutable
+        frozen = True
 
 settings = Settings()
