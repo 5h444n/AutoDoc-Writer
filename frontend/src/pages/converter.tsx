@@ -22,7 +22,7 @@ const Converter = () => {
       });
       const data = await response.json();
       setLatexOutput(data.latex);
-    } catch (_e) { alert("Backend Connection Error!"); }
+    } catch  { alert("Backend Connection Error!"); }
     finally { setIsLoading(false); }
   };
 
