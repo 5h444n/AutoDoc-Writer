@@ -1,4 +1,4 @@
-import { LayoutDashboard, Settings, LogOut, Bot, Sparkles, ChevronRight } from "lucide-react";
+import { LayoutDashboard, Settings, LogOut, Bot, Sparkles } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";

@@ -1,28 +1,16 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import LoginPage from "./pages/Login";
-import DashboardLayout from "./layouts/DashboardLayout";
-import RepositoriesPage from "./pages/Repositories";
+
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Login from './pages/Login';
+import Converter from './pages/converter'; 
 
 function App() {
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<LoginPage />} />
-        
-        {/* Protected Dashboard Routes */}
-        <Route path="/dashboard" element={<DashboardLayout />}>
-          {/* Index route renders when user hits /dashboard */}
-          <Route index element={<RepositoriesPage />} />
-          
-          {/* Placeholder for settings */}
-          <Route path="settings" element={<div className="text-white">Settings Page Coming Soon</div>} />
-        </Route>
-
-        {/* Catch-all redirect */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="/" element={<Login />} />
+        <Route path="/converter" element={<Converter />} />
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
 }
 
