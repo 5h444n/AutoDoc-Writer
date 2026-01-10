@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button'; 
-import { Github, LayoutDashboard, FolderOpen, LogOut, Wand2, FileCode } from 'lucide-react';
+import { Github, LayoutDashboard,  LogOut,  FileCode } from 'lucide-react';
 
 const BACKEND_URL = "http://localhost:8000"; // আপনার টিমেটের পোর্ট অনুযায়ী এটি চেক করুন
 
@@ -22,7 +22,7 @@ const Converter = () => {
       });
       const data = await response.json();
       setLatexOutput(data.latex);
-    } catch (e) { alert("Backend Connection Error!"); }
+    } catch (_e) { alert("Backend Connection Error!"); }
     finally { setIsLoading(false); }
   };
 
