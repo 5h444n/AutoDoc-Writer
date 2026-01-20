@@ -1,6 +1,7 @@
 import os
 from typing import List, Optional
 from pydantic_settings import BaseSettings
+from pydantic import ConfigDict
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "AutoDoc Writer"
@@ -30,18 +31,17 @@ class Settings(BaseSettings):
     # --- Database ---
     DATABASE_URL: str = "sqlite:///./autodoc.db"
 
-    class Config:
+    # Pydantic v2 configuration
+    model_config = ConfigDict(
         # 1. Get the directory of THIS file (backend/app/core/config.py)
-        _current_dir = os.path.dirname(os.path.abspath(__file__))
-
-        # 2. Go up 3 levels to get to the project root (AutoDoc-Writer/)
-        _root_dir = os.path.join(_current_dir, "..", "..", "..")
-
-        # 3. Point to the .env file in the root
-        env_file = os.path.join(_root_dir, ".env")
-        env_file_encoding = "utf-8"
-
+        env_file=os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", ".env"
+        ),
+        env_file_encoding="utf-8",
         # Ensure variable names match exactly (e.g., GITHUB_CLIENT_ID, not github_client_id)
-        case_sensitive = True
+        case_sensitive=True,
+        # Make settings immutable
+        frozen=True,
+    )
 
 settings = Settings()

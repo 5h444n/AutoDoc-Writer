@@ -24,6 +24,11 @@ class User(Base):
             return decrypt_token(self._access_token)
         return None
 
+    @access_token.expression
+    def access_token(cls):
+        """For SQLAlchemy queries, use the encrypted column directly."""
+        return cls._access_token
+
     @access_token.setter
     def access_token(self, value: Optional[str]):
         """Encrypts and stores the access token."""
