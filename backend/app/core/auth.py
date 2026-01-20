@@ -34,6 +34,7 @@ def get_current_user(
     # Import here to avoid circular dependency with app.models.user
     # TODO: Refactor architecture to eliminate this circular dependency
     from app.models.user import User
+    from app.core.security import encrypt_token
     
     if not credentials:
         raise HTTPException(
@@ -44,8 +45,11 @@ def get_current_user(
     
     token = credentials.credentials
     
-    # Find user by access token
-    user = db.query(User).filter(User.access_token == token).first()
+    # Encrypt the token to match the stored encrypted value
+    encrypted_token = encrypt_token(token)
+    
+    # Find user by encrypted access token
+    user = db.query(User).filter(User._access_token == encrypted_token).first()
     
     if not user:
         raise HTTPException(

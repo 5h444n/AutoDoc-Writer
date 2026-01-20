@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import List
 
 class RepoBase(BaseModel):
@@ -7,8 +7,7 @@ class RepoBase(BaseModel):
     last_updated: str
     is_active: bool = False  # <--- NEW: Sprint 2 Feature
 
-    class Config:
-        from_attributes = True  # Allows Pydantic to read from SQLAlchemy DB models
+    model_config = ConfigDict(from_attributes=True)
 
 class RepoResponse(BaseModel):
     total_repos: int

@@ -82,5 +82,5 @@ def test_settings_immutable():
 
 def test_settings_case_sensitive():
     """Test that settings are case-sensitive."""
-    # The Config class should have case_sensitive = True
-    assert settings.Config.case_sensitive is True
+    # The model_config should have case_sensitive = True
+    assert settings.model_config.get('case_sensitive') is True
