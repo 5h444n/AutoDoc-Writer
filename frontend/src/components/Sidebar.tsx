@@ -12,6 +12,7 @@ export function Sidebar() {
 
   const navItems = [
     { icon: LayoutDashboard, label: "Repositories", href: "/dashboard" },
+    { icon: Sparkles, label: "AI Playground", href: "/dashboard/playground" },
     { icon: Settings, label: "Settings", href: "/dashboard/settings" },
   ];
 

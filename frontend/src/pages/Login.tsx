@@ -7,7 +7,8 @@ export default function LoginPage() {
 
   const handleLogin = () => {
     setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 2000);
+    // Redirect to Backend OAuth Login Endpoint
+    window.location.href = "http://localhost:8000/api/v1/auth/login";
   };
 
   return (
