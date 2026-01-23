@@ -1,5 +1,5 @@
 import { Button } from "../components/ui/Button";
-import { LogOut, User, Github, Shield } from "lucide-react";
+import { LogOut, Github, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function SettingsPage() {

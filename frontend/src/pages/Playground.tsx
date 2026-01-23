@@ -33,8 +33,8 @@ export default function PlaygroundPage() {
 
         const data = await response.json();
         setResult(data.documentation || data); // Adjust based on actual response structure
-    } catch (err: any) {
-        setError(err.message);
+    } catch (err) {
+        setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
         setLoading(false);
     }
