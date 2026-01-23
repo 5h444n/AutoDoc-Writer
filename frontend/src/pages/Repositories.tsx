@@ -65,8 +65,8 @@ export default function RepositoriesPage() {
 
         const data = await response.json();
         setRepos(data.repos || []);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "An error occurred");
       } finally {
         setLoading(false);
       }
