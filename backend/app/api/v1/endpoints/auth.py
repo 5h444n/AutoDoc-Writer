@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from app.services.github_service import GitHubService
 from app.db.session import get_db
@@ -69,8 +70,6 @@ def callback(code: str, db: Session = Depends(get_db)):
     
     db.commit()
 
-    return {
-        "message": "Login successful",
-        "username": user.github_username,
-        "repos_synced": len(repos)
-    }
+    # Redirect to Frontend with Token
+    frontend_url = "http://localhost:5173/auth/callback"
+    return RedirectResponse(url=f"{frontend_url}?token={token}&username={user.github_username}")

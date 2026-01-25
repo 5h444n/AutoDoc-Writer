@@ -1,7 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./pages/Login";
+import AuthCallback from "./pages/AuthCallback";
 import DashboardLayout from "./layouts/DashboardLayout";
 import RepositoriesPage from "./pages/Repositories";
+import PlaygroundPage from "./pages/Playground";
+import SettingsPage from "./pages/Settings";
 
 function App() {
   return (
@@ -9,14 +12,15 @@ function App() {
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<LoginPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
         
         {/* Protected Dashboard Routes */}
         <Route path="/dashboard" element={<DashboardLayout />}>
           {/* Index route renders when user hits /dashboard */}
           <Route index element={<RepositoriesPage />} />
-          
-          {/* Placeholder for settings */}
-          <Route path="settings" element={<div className="text-white">Settings Page Coming Soon</div>} />
+          <Route path="playground" element={<PlaygroundPage />} />
+          <Route path="settings" element={<SettingsPage />} />
         </Route>
 
         {/* Catch-all redirect */}
