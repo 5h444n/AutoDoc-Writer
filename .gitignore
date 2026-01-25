@@ -127,3 +127,4 @@ autodoc.db
 # Local AI Models (if you download any large model files later)
 *.gguf
 *.bin
+autodoc-studio-main

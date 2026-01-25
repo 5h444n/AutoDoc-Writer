@@ -1,141 +1,73 @@
-# AutoDoc-Writer Frontend
+# Welcome to your Lovable project
 
-React + TypeScript + Vite frontend for the AutoDoc-Writer application.
+## Project info
 
-## Overview
+**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
 
-This is the web interface for AutoDoc-Writer, an AI-powered code documentation generator. The frontend provides a modern, intuitive interface for users to authenticate with GitHub, browse repositories, and generate documentation in multiple formats.
+## How can I edit this code?
 
-## Tech Stack
+There are several ways of editing your application.
 
-- **React 19.2** - UI library
-- **TypeScript 5.9** - Type-safe JavaScript
-- **Vite 7.2** - Fast build tool and dev server
-- **ESLint** - Code linting
+**Use Lovable**
 
-## Development
+Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
 
-### Prerequisites
+Changes made via Lovable will be committed automatically to this repo.
 
-- Node.js 16.0 or higher
-- npm 8.0 or higher
+**Use your preferred IDE**
 
-### Setup
+If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
 
-```bash
-# Install dependencies
-npm install
+The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
-# Start development server
+Follow these steps:
+
+```sh
+# Step 1: Clone the repository using the project's Git URL.
+git clone <YOUR_GIT_URL>
+
+# Step 2: Navigate to the project directory.
+cd <YOUR_PROJECT_NAME>
+
+# Step 3: Install the necessary dependencies.
+npm i
+
+# Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
-
-# The app will be available at http://localhost:5173
 ```
 
-### Available Scripts
+**Edit a file directly in GitHub**
 
-```bash
-# Start development server with hot reload
-npm run dev
+- Navigate to the desired file(s).
+- Click the "Edit" button (pencil icon) at the top right of the file view.
+- Make your changes and commit the changes.
 
-# Build for production
-npm run build
+**Use GitHub Codespaces**
 
-# Preview production build
-npm run preview
+- Navigate to the main page of your repository.
+- Click on the "Code" button (green button) near the top right.
+- Select the "Codespaces" tab.
+- Click on "New codespace" to launch a new Codespace environment.
+- Edit files directly within the Codespace and commit and push your changes once you're done.
 
-# Run linter
-npm run lint
-```
+## What technologies are used for this project?
 
-## Project Structure
+This project is built with:
 
-```
-frontend/
-├── src/
-│   ├── App.tsx           # Main application component
-│   ├── main.tsx          # Application entry point
-│   ├── assets/           # Static assets (images, icons)
-│   ├── App.css           # Application styles
-│   └── index.css         # Global styles
-├── public/               # Public static files
-├── index.html            # HTML entry point
-├── package.json          # Dependencies and scripts
-├── tsconfig.json         # TypeScript configuration
-├── vite.config.ts        # Vite configuration
-└── eslint.config.js      # ESLint configuration
-```
+- Vite
+- TypeScript
+- React
+- shadcn-ui
+- Tailwind CSS
 
-## Environment Variables
+## How can I deploy this project?
 
-The frontend connects to the backend API. By default, it expects the backend to be running at `http://localhost:8000`.
+Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
 
-## Code Quality
+## Can I connect a custom domain to my Lovable project?
 
-### Linting
+Yes, you can!
 
-This project uses ESLint with TypeScript and React-specific rules. Run linting with:
+To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
-```bash
-npm run lint
-```
-
-### Type Checking
-
-TypeScript is configured in strict mode for enhanced type safety. Build the project to check for type errors:
-
-```bash
-npm run build
-```
-
-## Backend Integration
-
-The frontend communicates with the FastAPI backend for:
-- GitHub OAuth authentication
-- Repository listing
-- Documentation generation
-- AI-powered content creation
-
-Ensure the backend is running before starting the frontend. See the main [README](../README.md) for backend setup instructions.
-
-## Contributing
-
-When contributing to the frontend:
-
-1. Follow the existing code style
-2. Use TypeScript for all new files
-3. Run `npm run lint` before committing
-4. Ensure `npm run build` completes without errors
-5. Use functional components with hooks (no class components)
-
-## Build and Deployment
-
-### Production Build
-
-```bash
-npm run build
-```
-
-This creates an optimized production build in the `dist/` directory.
-
-### Preview Production Build
-
-```bash
-npm run preview
-```
-
-### Deployment
-
-The built files in `dist/` can be deployed to any static hosting service:
-- Vercel
-- Netlify
-- Cloudflare Pages
-- AWS S3 + CloudFront
-- GitHub Pages
-
-## Learn More
-
-- [React Documentation](https://react.dev/)
-- [TypeScript Documentation](https://www.typescriptlang.org/)
-- [Vite Documentation](https://vite.dev/)
-- [Main Project README](../README.md)
+Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
