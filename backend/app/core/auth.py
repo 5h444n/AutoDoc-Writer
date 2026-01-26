@@ -6,6 +6,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from typing import TYPE_CHECKING
 from app.db.session import get_db
+from app.core.validators import InputValidator
 
 if TYPE_CHECKING:
     from app.models.user import User
@@ -43,7 +44,8 @@ def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
     
-    token = credentials.credentials
+    # Validate token format
+    token = InputValidator.validate_github_token(credentials.credentials)
     
     # Hash the token to look it up in the database
     token_hash = hashlib.sha256(token.encode()).hexdigest()
