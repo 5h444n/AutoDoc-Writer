@@ -21,6 +21,7 @@ os.environ["GITHUB_CLIENT_SECRET"] = "test_client_secret"
 os.environ["REDIRECT_URI"] = "http://localhost:5173/callback"
 os.environ["DATABASE_URL"] = "sqlite:///:memory:"
 os.environ["GEMINI_API_KEY"] = "test_api_key"
+os.environ["SECRET_KEY"] = "test_secret_key_for_testing_only_do_not_use_in_production"
 
 from app.db.base import Base
 from app.db.session import get_db

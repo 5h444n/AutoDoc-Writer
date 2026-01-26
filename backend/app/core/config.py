@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: Optional[str] = None
 
     # --- Security ---
-    SECRET_KEY: str = "change_this_in_production"
+    SECRET_KEY: str  # Required - no default value for security
 
     # --- GitHub URLs -----------------ADDED THIS PART TANIM
     GITHUB_AUTH_URL: str = "https://github.com/login/oauth/authorize"

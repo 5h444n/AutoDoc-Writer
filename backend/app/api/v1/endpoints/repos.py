@@ -1,17 +1,23 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from app.db.session import get_db
 from app.models.repository import Repository
 from app.models.user import User
 from app.schemas.repo import RepoResponse, RepoToggleRequest
 from app.core.auth import get_current_user
 from app.services.github_service import GitHubService
+from app.core.validators import InputValidator
 
 router = APIRouter()
+limiter = Limiter(key_func=get_remote_address)
 
 # 1. GET Repos (Reads from Database instead of GitHub API)
 @router.get("/", response_model=RepoResponse)
+@limiter.limit("30/minute")
 def read_repos(
+    request: Request,
     include_commit_count: bool = False,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -19,6 +25,7 @@ def read_repos(
     """
     Fetches repositories from GitHub and merges monitoring status from the database.
     Requires authentication via Bearer token.
+    Rate limit: 30 requests per minute.
     """
     repo_status = {repo.name: repo.is_active for repo in current_user.repos}
     repos = GitHubService.get_user_repos(current_user.access_token)
@@ -60,7 +67,9 @@ def read_repos(
 
 # 2. PATCH Toggle (The new Sprint 2 Feature)
 @router.patch("/{repo_name}/toggle")
+@limiter.limit("60/minute")
 def toggle_repo_monitoring(
+    request: Request,
     repo_name: str, 
     toggle: RepoToggleRequest,
     current_user: User = Depends(get_current_user),
@@ -70,7 +79,11 @@ def toggle_repo_monitoring(
     Enables or Disables monitoring for a specific repository.
     Requires authentication via Bearer token.
     Users can only toggle their own repositories.
+    Rate limit: 60 requests per minute.
     """
+    # Validate repository name to prevent injection attacks
+    repo_name = InputValidator.validate_repository_name(repo_name)
+    
     # Find the specific repo belonging to the authenticated user
     repo = db.query(Repository).filter(
         Repository.name == repo_name,

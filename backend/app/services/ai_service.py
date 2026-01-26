@@ -55,9 +55,30 @@ def get_model_name() -> str:
         return _cached_model_name
 
 
-def generate_text(prompt: str) -> str:
+def generate_text(prompt: str, system_instruction: str = None) -> str:
+    """Generate text using Google Gemini AI.
+    
+    Args:
+        prompt: User prompt with code to analyze
+        system_instruction: Optional system instruction to guide AI behavior
+        
+    Returns:
+        Generated text response
+        
+    Raises:
+        HTTPException: If API quota exceeded or other errors occur
+    """
     model_name = get_model_name()
-    model = genai.GenerativeModel(model_name)
+    
+    # Create model with system instruction if provided
+    if system_instruction:
+        model = genai.GenerativeModel(
+            model_name,
+            system_instruction=system_instruction
+        )
+    else:
+        model = genai.GenerativeModel(model_name)
+    
     try:
         response = model.generate_content(prompt)
     except ResourceExhausted:
@@ -65,4 +86,14 @@ def generate_text(prompt: str) -> str:
             status_code=429,
             detail="Gemini quota exceeded. Try later or update billing."
         )
-    return response.text.replace("```json", "").replace("```", "").strip()
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"AI generation error: {str(e)}"
+        )
+    
+    # Clean up markdown code blocks if present
+    text = response.text
+    text = text.replace("```json", "").replace("```", "").strip()
+    
+    return text
