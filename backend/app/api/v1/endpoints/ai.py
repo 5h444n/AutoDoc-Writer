@@ -1,84 +1,47 @@
 import google.generativeai as genai
 import os
-import threading
+import warnings
+import uuid
+from datetime import datetime
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from dotenv import load_dotenv
 
 load_dotenv()
 
+# SILENCE THE WARNING: This hides the deprecation message so terminal stays clean
+warnings.filterwarnings("ignore", category=FutureWarning)
+warnings.filterwarnings("ignore", category=UserWarning, module="google.generativeai")
+
 router = APIRouter()
 
-# 1. Configure Gemini
+# Global In-Memory History Storage
+HISTORY_DB = []
+
+# 1. Configure Global Auth
 api_key = os.getenv("GEMINI_API_KEY")
 if not api_key:
     print("⚠️ WARNING: GEMINI_API_KEY not found in .env file")
 else:
     genai.configure(api_key=api_key)
 
-# Module-level cache for discovered model name
-_cached_model_name = None
-_model_lock = threading.Lock()
-
-def _discover_model():
-    """
-    Discovers and caches the best available Gemini model.
-    This function is called once and the result is cached.
-    Thread-safe implementation using a lock.
-    """
-    global _cached_model_name
-    
-    # Quick check without lock (double-checked locking pattern)
-    if _cached_model_name is not None:
-        return _cached_model_name
-    
-    with _model_lock:
-        # Check again after acquiring lock
-        if _cached_model_name is not None:
-            return _cached_model_name
-        
-        # 1. Ask Google which models are available for this specific API Key
-        all_models = list(genai.list_models())
-        
-        # 2. Filter for models that can generate content (text)
-        valid_models = [
-            m.name for m in all_models 
-            if 'generateContent' in m.supported_generation_methods
-        ]
-        
-        if not valid_models:
-            raise HTTPException(status_code=500, detail="Your API Key has no access to any AI models. Check Google AI Studio.")
-        
-        # 3. Smart Selection: Prefer 'flash', then 'pro', then whatever is left
-        chosen_model_name = next((m for m in valid_models if 'flash' in m), None)
-        if not chosen_model_name:
-            chosen_model_name = next((m for m in valid_models if 'pro' in m), valid_models[0])
-        
-        print(f"🤖 Server selected model: {chosen_model_name}") # This prints to your terminal so you know what worked
-        
-        _cached_model_name = chosen_model_name
-        return _cached_model_name
-
-# 2. Define Input Model
+# Define Input Model
 class GenerateReq(BaseModel):
     code: str
     style: str = "standard"
 
-# 3. The Generation Endpoint
+# The Generation Endpoint
 @router.post("/preview")
 async def generate_preview(request: GenerateReq):
     """
-    Automatically finds a working Gemini model and generates a preview.
+    Generates a preview using the Legacy Google Generative AI SDK.
     """
     if not api_key:
         raise HTTPException(status_code=500, detail="Server Error: GEMINI_API_KEY is missing.")
 
     try:
-        # Use cached model discovery
-        chosen_model_name = _discover_model()
-        
-        # Initialize the chosen model
-        model = genai.GenerativeModel(chosen_model_name)
+        # 2. Initialize the Reliable Model (Flash Latest)
+        model = genai.GenerativeModel("models/gemini-flash-latest")
 
         system_instruction = "You are an expert technical writer."
         if request.style == "latex":
@@ -93,13 +56,73 @@ async def generate_preview(request: GenerateReq):
         {request.code}
         """
         
+        # 3. Generate Content
         response = model.generate_content(prompt)
         
+        # 4. Extract Text
+        generated_text = response.text
+        
         # Clean up text
-        clean_text = response.text.replace("```json", "").replace("```", "").strip()
+        clean_text = generated_text.replace("```json", "").replace("```", "").strip()
         
         return {"ai_response": clean_text}
 
     except Exception as e:
-        print(f"❌ AI Error: {e}") # Check your terminal for this if it fails
-        raise HTTPException(status_code=500, detail="AI Service Error. Please try again later.")
+        print(f"❌ AI Error: {e}")
+        raise HTTPException(status_code=500, detail=f"AI Service Error: {str(e)}")
+
+
+class RepoGenerateReq(BaseModel):
+    repo_url: str
+    style: str = "plain"
+    instructions: str = ""
+
+@router.post("/generate")
+async def generate_repo_docs(request: RepoGenerateReq):
+    """
+    Generates documentation for a full repository and saves to history.
+    """
+    if not api_key:
+        raise HTTPException(status_code=500, detail="Server Error: GEMINI_API_KEY is missing.")
+
+    try:
+        # 2. Initialize the Reliable Model (Flash Latest)
+        model = genai.GenerativeModel("models/gemini-flash-latest")
+
+        prompt = f"""
+        You are an expert technical writer.
+        Task: Generate comprehensive documentation for the repository at: {request.repo_url}
+        
+        Style: {request.style}
+        Custom Instructions: {request.instructions}
+        
+        Please provide a detailed documentation structure and overview.
+        """
+        
+        response = model.generate_content(prompt)
+        generated_text = response.text
+        
+        clean_text = generated_text.replace("```json", "").replace("```", "").strip()
+        
+        # Save to History
+        history_item = {
+            "id": str(uuid.uuid4()),
+            "repo_name": request.repo_url, 
+            "style": request.style,
+            "timestamp": datetime.now().isoformat(),
+            "status": "Success"
+        }
+        HISTORY_DB.insert(0, history_item) # Add to top of list
+        
+        return {"documentation": clean_text}
+
+    except Exception as e:
+        print(f"❌ AI Error: {e}")
+        raise HTTPException(status_code=500, detail=f"AI Service Error: {str(e)}")
+
+@router.get("/history")
+async def get_history():
+    """
+    Returns the global generation history.
+    """
+    return HISTORY_DB

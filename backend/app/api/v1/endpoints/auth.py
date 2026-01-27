@@ -1,76 +1,69 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from app.services.github_service import GitHubService
-from app.db.session import get_db
-from app.models.user import User
-from app.models.repository import Repository
+from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import RedirectResponse
+import httpx
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 router = APIRouter()
+
+GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID", "Ov23liarD6NyPCrJjvMG")
+GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET", "7dfe8c4d77365e903696d9cbbe21bfe64befeddf")
 
 @router.get("/login")
 def login():
     """
     Redirects the user to GitHub's OAuth login page.
     """
-    return GitHubService.get_login_redirect()
+    return RedirectResponse(url=f"https://github.com/login/oauth/authorize?client_id={GITHUB_CLIENT_ID}&scope=repo")
 
 @router.get("/callback")
-def callback(code: str, db: Session = Depends(get_db)):
+async def callback(code: str):
     """
-    Processes the GitHub callback:
-    1. Exchanges code for token.
-    2. Fetches user profile & repos.
-    3. Saves User and Repositories to the database.
+    Exchanges code for token and redirects to frontend.
     """
-    # 1. Exchange code for access token
-    try:
-        token = GitHubService.exchange_code_for_token(code)
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Token Exchange Failed: {str(e)}")
+    async with httpx.AsyncClient() as client:
+        # Exchange code for access token
+        response = await client.post(
+            "https://github.com/login/oauth/access_token",
+            headers={"Accept": "application/json"},
+            json={
+                "client_id": GITHUB_CLIENT_ID,
+                "client_secret": GITHUB_CLIENT_SECRET,
+                "code": code
+            }
+        )
+        data = response.json()
+        access_token = data.get("access_token")
+        
+        if not access_token:
+            raise HTTPException(status_code=400, detail="Failed to retrieve access token from GitHub")
+
+        # Redirect to frontend with token
+        return RedirectResponse(url=f"http://localhost:5173?github_token={access_token}")
+
+@router.get("/github/repos")
+async def get_github_repos(authorization: str = None):
+    """
+    Fetches the user's repositories from GitHub.
+    Accepts 'Authorization: Bearer <token>' header.
+    """
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Missing or invalid Authorization header")
     
-    # 2. Get GitHub Username
-    gh_username = GitHubService.get_user_profile(token)
+    token = authorization.split(" ")[1]
     
-    if not gh_username:
-        raise HTTPException(status_code=400, detail="Could not fetch GitHub profile")
-
-    # 3. Find or Create User in Database
-    user = db.query(User).filter(User.github_username == gh_username).first()
-    if not user:
-        user = User(github_username=gh_username, access_token=token)
-        db.add(user)
-    else:
-        # Update the access token for existing users
-        user.access_token = token
-    
-    # Commit user changes before fetching repos (need user.id)
-    db.commit()
-    db.refresh(user)
-
-    # 4. Fetch Repos from GitHub
-    repos = GitHubService.get_user_repos(token)
-
-    # 5. Sync Repos to Database (Using correct ["key"] syntax)
-    for repo_data in repos:
-        # Check if repo already exists
-        existing_repo = db.query(Repository).filter(
-            Repository.name == repo_data["name"],
-            Repository.owner_id == user.id
-        ).first()
-
-        if not existing_repo:
-            new_repo = Repository(
-                name=repo_data["name"],
-                url=repo_data["url"], 
-                last_updated=repo_data["last_updated"],
-                owner_id=user.id
-            )
-            db.add(new_repo)
-    
-    db.commit()
-
-    return {
-        "message": "Login successful",
-        "username": user.github_username,
-        "repos_synced": len(repos)
-    }
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            "https://api.github.com/user/repos?sort=updated&per_page=100&type=all",
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Accept": "application/vnd.github.v3+json"
+            }
+        )
+        
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail="Failed to fetch repositories from GitHub")
+            
+        return response.json()
