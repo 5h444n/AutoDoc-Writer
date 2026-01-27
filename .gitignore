@@ -106,6 +106,10 @@ node_modules/
 # Vite specific
 .vite/
 
+# Allow frontend source libraries (ignored by generic lib/ rule above)
+!frontend/src/lib/
+!frontend/src/lib/**
+
 # ==========================================
 # Database & Local Storage
 # ==========================================

@@ -12,6 +12,9 @@ class RepoBase(BaseModel):
     commits: Optional[int] = None
     last_updated: Optional[str] = None
     is_active: bool = False
+    docs_active: bool = False
+    docs_style: Optional[str] = None
+    docs_complexity: Optional[int] = None
 
     model_config = ConfigDict(from_attributes=True)
 

@@ -159,7 +159,8 @@ export default function Commits() {
       setSelectedCommit(null);
       navigate('/documentation', { state: { documentation } });
     } catch (err) {
-      toast.error('Documentation generation failed.', { id: 'generate' });
+      const message = err instanceof Error ? err.message : 'Documentation generation failed.';
+      toast.error(message, { id: 'generate' });
     } finally {
       setIsGenerating(false);
     }

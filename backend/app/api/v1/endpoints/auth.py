@@ -57,19 +57,28 @@ def callback(code: str, db: Session = Depends(get_db)):
     # 5. Sync Repos to Database (Using correct ["key"] syntax)
     for repo_data in repos:
         # Check if repo already exists
+        repo_full_name = repo_data.get("full_name") or repo_data["name"]
         existing_repo = db.query(Repository).filter(
-            Repository.name == repo_data["name"],
-            Repository.owner_id == user.id
+            Repository.full_name == repo_full_name,
+            Repository.owner_id == user.id,
         ).first()
+        if not existing_repo:
+            existing_repo = db.query(Repository).filter(
+                Repository.name == repo_data["name"],
+                Repository.owner_id == user.id,
+            ).first()
 
         if not existing_repo:
             new_repo = Repository(
                 name=repo_data["name"],
-                url=repo_data["url"], 
+                full_name=repo_full_name,
+                url=repo_data["url"],
                 last_updated=repo_data.get("updated_at"),
-                owner_id=user.id
+                owner_id=user.id,
             )
             db.add(new_repo)
+        elif not existing_repo.full_name:
+            existing_repo.full_name = repo_full_name
     
     db.commit()
 

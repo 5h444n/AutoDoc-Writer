@@ -14,7 +14,7 @@ from app.services.github_service import GitHubService
 
 router = APIRouter()
 
-MAX_CONTEXT_CHARS = 12000
+MAX_CONTEXT_CHARS = 4000
 
 
 def _truncate(text: str, max_chars: int) -> str:
@@ -45,7 +45,7 @@ def _build_commit_context(detail: dict) -> str:
         lines.append(f"- {filename} (+{additions}/-{deletions})")
         patch = file_info.get("patch")
         if patch:
-            lines.append(_truncate(patch, 2000))
+            lines.append(_truncate(patch, 800))
             lines.append("")
 
     return _truncate("\n".join(lines), MAX_CONTEXT_CHARS)

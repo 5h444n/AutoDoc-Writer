@@ -21,6 +21,7 @@ def read_repos(
     Requires authentication via Bearer token.
     """
     repo_status = {repo.name: repo.is_active for repo in current_user.repos}
+    repo_meta = {repo.name: repo for repo in current_user.repos}
     repos = GitHubService.get_user_repos(current_user.access_token)
 
     merged = []
@@ -28,12 +29,18 @@ def read_repos(
         if repo.get("name") not in repo_status:
             new_repo = Repository(
                 name=repo.get("name"),
+                full_name=repo.get("full_name") or repo.get("name"),
                 url=repo.get("url"),
                 last_updated=repo.get("updated_at"),
                 owner_id=current_user.id,
             )
             db.add(new_repo)
             repo_status[repo.get("name")] = False
+            repo_meta[repo.get("name")] = new_repo
+        else:
+            existing = repo_meta.get(repo.get("name"))
+            if existing and not existing.full_name:
+                existing.full_name = repo.get("full_name") or repo.get("name")
 
         commit_count = None
         if include_commit_count and repo.get("full_name"):
@@ -41,6 +48,7 @@ def read_repos(
                 current_user.access_token, repo["full_name"]
             )
 
+        existing_meta = repo_meta.get(repo.get("name"))
         merged.append({
             "id": repo.get("id"),
             "name": repo.get("name"),
@@ -51,6 +59,9 @@ def read_repos(
             "stars": repo.get("stars", 0),
             "last_updated": repo.get("updated_at"),
             "is_active": repo_status.get(repo.get("name"), False),
+            "docs_active": existing_meta.docs_active if existing_meta else False,
+            "docs_style": existing_meta.docs_style if existing_meta else None,
+            "docs_complexity": existing_meta.docs_complexity if existing_meta else None,
             "commits": commit_count,
         })
 

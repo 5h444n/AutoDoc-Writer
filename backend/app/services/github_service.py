@@ -1,3 +1,4 @@
+import base64
 import requests
 from fastapi import HTTPException
 from fastapi.responses import RedirectResponse
@@ -222,3 +223,37 @@ class GitHubService:
             results.append(entry)
 
         return results
+
+    @staticmethod
+    def get_repo_tree(access_token: str, repo_full_name: str, ref: str = "HEAD"):
+        """Fetches the repository tree (optionally recursive)."""
+        url = f"https://api.github.com/repos/{repo_full_name}/git/trees/{ref}"
+        headers = GitHubService._headers(access_token)
+        params = {"recursive": "1"}
+        response = GitHubService._request("get", url, headers=headers, params=params)
+        GitHubService._raise_for_status(response, "Failed to fetch repository tree")
+        return response.json().get("tree", [])
+
+    @staticmethod
+    def get_file_content(access_token: str, repo_full_name: str, path: str, ref: str = "HEAD"):
+        """Fetches a file's content (base64 decoded) and sha via GitHub contents API."""
+        url = f"https://api.github.com/repos/{repo_full_name}/contents/{path}"
+        headers = GitHubService._headers(access_token)
+        params = {"ref": ref} if ref else None
+        response = GitHubService._request("get", url, headers=headers, params=params)
+        GitHubService._raise_for_status(response, "Failed to fetch file content")
+        data = response.json()
+        if isinstance(data, list):
+            return None, None
+        content = data.get("content")
+        encoding = data.get("encoding")
+        sha = data.get("sha")
+        if not content:
+            return None, sha
+        if encoding == "base64":
+            try:
+                decoded = base64.b64decode(content).decode("utf-8", errors="ignore")
+            except Exception:
+                return None, sha
+            return decoded, sha
+        return str(content), sha

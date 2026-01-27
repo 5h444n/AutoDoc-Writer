@@ -142,8 +142,9 @@ export default function Documentation() {
       localStorage.setItem('latest_documentation', JSON.stringify(updated));
       setDoc(updated);
       toast.success(force ? 'Documentation regenerated!' : 'Documentation generated!');
-    } catch {
-      toast.error('Failed to generate documentation.');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to generate documentation.';
+      toast.error(message);
     } finally {
       setIsRegenerating(false);
     }
