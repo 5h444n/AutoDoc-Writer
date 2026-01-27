@@ -1,0 +1,17 @@
+site_name: AutoDoc Writer
+site_description: AI-Powered Documentation Generator
+theme:
+  name: material
+  palette: 
+    primary: indigo
+    accent: blue
+  features:
+    - navigation.tabs
+
+nav:
+  - Introduction: index.md
+  - Features: features.md
+  - How to Run It: setup.md
+  - How to Use It: usage.md
+  - How We Made It: architecture.md
+  - Roadmap: roadmap.md
