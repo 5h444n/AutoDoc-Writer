@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Loader2, RefreshCw, Plus, Wand2, Copy, Download, FileCode, FileText, BookOpen, CheckCircle2, X } from 'lucide-react';
+import { Loader2, RefreshCw, Plus, Wand2, Copy, Download, FileCode, FileText, BookOpen, CheckCircle2, X, Star } from 'lucide-react';
 import { Toaster, toast } from 'sonner';
 import { jsPDF } from 'jspdf';
 import { Sidebar } from '../components/Sidebar';
@@ -18,11 +18,41 @@ export default function Dashboard() {
     const [githubRepos, setGithubRepos] = useState<any[]>([]);
     const [manualRepos, setManualRepos] = useState<any[]>([]);
     const [selectedRepo, setSelectedRepo] = useState<any | null>(null);
-    const [activeView, setActiveView] = useState<'repos' | 'history' | 'about' | 'settings'>('repos');
+    const [activeView, setActiveView] = useState<'repos' | 'documents' | 'history' | 'about' | 'settings'>('repos');
     const [loading, setLoading] = useState(true);
     const [showImport, setShowImport] = useState(false);
     const [settings, setSettings] = useState({ displayName: 'User', language: 'English', model: 'gemini-2.0-flash-lite', temperature: 0.7, apiKey: '' });
     const [user, setUser] = useState<any>(null);
+
+    // QoL State
+    const [isCollapsed, setIsCollapsed] = useState(false);
+    const [pinnedRepos, setPinnedRepos] = useState<number[]>([]);
+    const [savedDocs, setSavedDocs] = useState<any[]>([]);
+
+    // QoL Load Effects
+    useEffect(() => {
+        const savedPinned = localStorage.getItem('pinned_repos');
+        if (savedPinned) setPinnedRepos(JSON.parse(savedPinned));
+
+        const savedDocsValid = localStorage.getItem('saved_docs');
+        if (savedDocsValid) setSavedDocs(JSON.parse(savedDocsValid));
+    }, []);
+
+    const togglePin = (id: number) => {
+        setPinnedRepos(prev => {
+            const newPinned = prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id];
+            localStorage.setItem('pinned_repos', JSON.stringify(newPinned));
+            return newPinned;
+        });
+    };
+
+    const sortedRepos = [...githubRepos].sort((a, b) => {
+        const isAPinned = pinnedRepos.includes(a.id);
+        const isBPinned = pinnedRepos.includes(b.id);
+        if (isAPinned && !isBPinned) return -1;
+        if (!isAPinned && isBPinned) return 1;
+        return 0;
+    });
 
 
     // Generation State
@@ -144,7 +174,21 @@ export default function Dashboard() {
             });
 
             setGeneratedDoc(response.data.documentation);
-            toast.success('Documentation generated successfully!');
+
+            // Auto-Save to Vault
+            const newDoc = {
+                id: Date.now(),
+                repoName: selectedRepo.name,
+                content: response.data.documentation,
+                date: new Date().toLocaleString()
+            };
+            setSavedDocs(prev => {
+                const updated = [newDoc, ...prev];
+                localStorage.setItem('saved_docs', JSON.stringify(updated));
+                return updated;
+            });
+
+            toast.success('Documentation generated and saved to Vault!');
 
         } catch (error) {
             console.error(error);
@@ -156,8 +200,8 @@ export default function Dashboard() {
 
     return (
         <div className="flex h-screen bg-slate-950 text-slate-200 selection:bg-indigo-500/30 overflow-hidden">
-            <Sidebar activeView={activeView} onNavigate={setActiveView} onLogout={handleLogout} user={user} />
-            <main className="flex-1 ml-64 p-8 overflow-auto relative scrollbar-hide">
+            <Sidebar activeView={activeView} onNavigate={setActiveView} onLogout={handleLogout} user={user} isCollapsed={isCollapsed} toggleCollapse={() => setIsCollapsed(!isCollapsed)} />
+            <main className={`flex-1 ${isCollapsed ? 'ml-20' : 'ml-64'} p-8 overflow-auto relative scrollbar-hide transition-all duration-300`}>
                 {activeView === 'repos' && (
                     <div className="max-w-7xl mx-auto space-y-8">
                         {/* Header Area */}
@@ -333,8 +377,14 @@ export default function Dashboard() {
                                         </div>
                                     ) : (
                                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                            {githubRepos.map((repo, i) => (
-                                                <GlassCard delay={i * 0.05} key={repo.id} onClick={() => setSelectedRepo(repo)} className="cursor-pointer hover:bg-white/5">
+                                            {sortedRepos.map((repo, i) => (
+                                                <GlassCard delay={i * 0.05} key={repo.id} onClick={() => setSelectedRepo(repo)} className="cursor-pointer hover:bg-white/5 relative group">
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); togglePin(repo.id); }}
+                                                        className={`absolute top-4 right-4 z-20 p-1.5 rounded-full transition-all ${pinnedRepos.includes(repo.id) ? 'bg-yellow-500/20 text-yellow-400' : 'bg-transparent text-slate-600 hover:bg-white/10 hover:text-yellow-400'}`}
+                                                    >
+                                                        <Star className={`w-4 h-4 ${pinnedRepos.includes(repo.id) ? 'fill-yellow-400' : ''}`} />
+                                                    </button>
                                                     <RepoCard
                                                         name={repo.name}
                                                         description={repo.description}
@@ -375,8 +425,37 @@ export default function Dashboard() {
                             </div>
                         )}
                     </div>
-                )
-                }
+                )}
+                {activeView === 'documents' && (
+                    <div className="max-w-7xl mx-auto space-y-6 animate-in fade-in duration-500">
+                        <h2 className="text-3xl font-bold text-white flex items-center gap-2">
+                            <FileText className="h-8 w-8 text-violet-400" />
+                            My Saved Documents
+                        </h2>
+                        {savedDocs.length === 0 ? (
+                            <div className="p-10 border border-dashed border-white/10 rounded-xl text-center text-slate-500">
+                                No documents saved yet. Generate one to see it here!
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {savedDocs.map(doc => (
+                                    <GlassCard key={doc.id} className="flex flex-col gap-4 border-violet-500/10 hover:border-violet-500/30">
+                                        <div>
+                                            <h3 className="font-bold text-white text-lg">{doc.repoName}</h3>
+                                            <p className="text-xs text-violet-300/60 mt-1 font-mono">{doc.date}</p>
+                                        </div>
+                                        <div className="mt-auto flex gap-2 pt-4">
+                                            <GlowButton onClick={() => downloadFile(`${doc.repoName}.md`, doc.content)} className="w-full text-sm py-2 group">
+                                                <Download className="w-4 h-4 group-hover:animate-bounce" />
+                                                Download
+                                            </GlowButton>
+                                        </div>
+                                    </GlassCard>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
                 {activeView === 'history' && <HistoryView />}
                 {activeView === 'about' && <AboutView onClose={() => setActiveView('repos')} />}
                 {activeView === 'settings' && <SettingsView settings={settings} onSave={setSettings} />}
