@@ -37,37 +37,37 @@ export function HistoryView() {
     }, []);
 
     return (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden h-full flex flex-col">
-            <div className="p-4 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
-                <h3 className="font-semibold text-gray-800 flex items-center gap-2">
-                    <History className="w-4 h-4 text-blue-600" />
+        <div className="bg-[#111] rounded-xl border border-white/5 overflow-hidden h-full flex flex-col">
+            <div className="p-4 border-b border-white/5 bg-white/5 flex items-center justify-between">
+                <h3 className="font-semibold text-white flex items-center gap-2">
+                    <History className="w-4 h-4 text-violet-500" />
                     Activity Feed
                 </h3>
-                <button onClick={fetchHistory} className="p-1 hover:bg-gray-200 rounded-full transition-colors">
-                    <RefreshCw className="w-4 h-4 text-gray-500" />
+                <button onClick={fetchHistory} className="p-1 hover:bg-white/10 rounded-full transition-colors">
+                    <RefreshCw className="w-4 h-4 text-gray-400" />
                 </button>
             </div>
 
-            <div className="flex-1 overflow-auto p-0">
+            <div className="flex-1 overflow-auto p-0 scrollbar-hide">
                 {history.length === 0 ? (
-                    <div className="p-8 text-center text-gray-400 text-sm">
+                    <div className="p-8 text-center text-gray-500 text-sm">
                         No activity yet.
                     </div>
                 ) : (
-                    <div className="divide-y divide-gray-100">
+                    <div className="divide-y divide-white/5">
                         {history.map((item) => (
-                            <div key={item.id} className="p-4 hover:bg-gray-50 transition-colors animate-in slide-in-from-left-2 duration-300">
+                            <div key={item.id} className="p-4 hover:bg-white/5 transition-colors animate-in slide-in-from-left-2 duration-300">
                                 <div className="flex items-start justify-between mb-1">
-                                    <span className="text-sm font-medium text-gray-900 truncate max-w-[180px]" title={item.repo_name}>
+                                    <span className="text-sm font-medium text-gray-200 truncate max-w-[180px]" title={item.repo_name}>
                                         {item.repo_name.replace('https://github.com/', '')}
                                     </span>
-                                    <span className="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
+                                    <span className="bg-green-500/10 text-green-400 text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
                                         <CheckCircle2 className="w-3 h-3" />
                                         {item.status}
                                     </span>
                                 </div>
                                 <div className="flex items-center justify-between text-xs text-gray-500">
-                                    <span className="capitalize bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">
+                                    <span className="capitalize bg-white/5 px-1.5 py-0.5 rounded text-gray-400">
                                         {item.style}
                                     </span>
                                     <span>

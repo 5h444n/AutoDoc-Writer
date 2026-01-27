@@ -38,17 +38,17 @@ export function SettingsView({ settings, onSave }: SettingsProps) {
         <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-500 pb-10">
             <header>
                 <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-                    <Settings className="w-6 h-6 text-blue-400" />
+                    <Settings className="w-6 h-6 text-violet-400" />
                     Settings
                 </h2>
                 <p className="text-slate-400 mt-1">Manage your profile and AI configuration.</p>
             </header>
 
             {/* Profile Settings */}
-            <GlassCard className="p-0 overflow-hidden border-blue-500/20 bg-blue-900/10">
+            <GlassCard className="p-0 overflow-hidden border-violet-500/20 bg-violet-900/10">
                 <div className="p-6 border-b border-white/5 bg-white/5">
                     <h3 className="font-semibold text-white flex items-center gap-2">
-                        <User className="w-4 h-4 text-blue-400" />
+                        <User className="w-4 h-4 text-violet-400" />
                         Profile Settings
                     </h3>
                 </div>
@@ -58,7 +58,7 @@ export function SettingsView({ settings, onSave }: SettingsProps) {
                         type="text"
                         value={displayName}
                         onChange={(e) => setDisplayName(e.target.value)}
-                        className="w-full max-w-md p-2.5 bg-slate-900/50 border border-white/10 rounded-lg focus:ring-2 focus:ring-blue-500/50 outline-none text-white placeholder:text-slate-600"
+                        className="w-full max-w-md p-2.5 bg-[#0f0f0f]/50 border border-white/10 rounded-lg focus:ring-2 focus:ring-violet-500/50 outline-none text-white placeholder:text-slate-600"
                     />
                     <p className="text-xs text-slate-500 mt-2">
                         This name will appear in the History timeline and generated reports.
@@ -81,7 +81,7 @@ export function SettingsView({ settings, onSave }: SettingsProps) {
                             <select
                                 value={model}
                                 onChange={(e) => setModel(e.target.value)}
-                                className="w-full p-2.5 bg-slate-900/50 border border-white/10 rounded-lg focus:ring-2 focus:ring-blue-500/50 outline-none text-white"
+                                className="w-full p-2.5 bg-[#0f0f0f]/50 border border-white/10 rounded-lg focus:ring-2 focus:ring-violet-500/50 outline-none text-white"
                             >
                                 <option value="gemini-2.0-flash-lite">Gemini 2.0 Flash Lite (Recommended)</option>
                                 <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
@@ -95,7 +95,7 @@ export function SettingsView({ settings, onSave }: SettingsProps) {
                                 <select
                                     value={language}
                                     onChange={(e) => setLanguage(e.target.value)}
-                                    className="w-full pl-10 p-2.5 bg-slate-900/50 border border-white/10 rounded-lg focus:ring-2 focus:ring-blue-500/50 outline-none text-white"
+                                    className="w-full pl-10 p-2.5 bg-[#0f0f0f]/50 border border-white/10 rounded-lg focus:ring-2 focus:ring-violet-500/50 outline-none text-white"
                                 >
                                     <option value="English">English</option>
                                     <option value="Spanish">Spanish</option>
@@ -118,7 +118,7 @@ export function SettingsView({ settings, onSave }: SettingsProps) {
                             step="0.1"
                             value={temperature}
                             onChange={(e) => setTemperature(parseFloat(e.target.value))}
-                            className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                            className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-violet-500"
                         />
                         <div className="flex justify-between mt-1 text-xs text-slate-500">
                             <span>Precise</span>
@@ -143,7 +143,7 @@ export function SettingsView({ settings, onSave }: SettingsProps) {
                             type="password"
                             value={apiKey}
                             onChange={(e) => setApiKey(e.target.value)}
-                            className="w-full font-mono text-sm p-2.5 bg-slate-900/50 border border-white/10 rounded-lg focus:ring-2 focus:ring-blue-500/50 outline-none text-white"
+                            className="w-full font-mono text-sm p-2.5 bg-[#0f0f0f]/50 border border-white/10 rounded-lg focus:ring-2 focus:ring-violet-500/50 outline-none text-white"
                         />
                     </div>
 

@@ -18,7 +18,7 @@ export function RepoStats({ repo }: { repo: any }) {
 
     return (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+            <div className="bg-[#111]/50 p-4 rounded-xl border border-white/5 shadow-sm hover:border-white/10 transition-colors">
                 <div className="flex items-center gap-2 text-gray-500 mb-1">
                     <Code2 className="h-4 w-4" />
                     <span className="text-xs font-medium">Language</span>
@@ -26,28 +26,28 @@ export function RepoStats({ repo }: { repo: any }) {
                 <p className={`text-lg font-bold ${color}`}>{repo.language || 'Unknown'}</p>
             </div>
 
-            <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+            <div className="bg-[#111]/50 p-4 rounded-xl border border-white/5 shadow-sm hover:border-white/10 transition-colors">
                 <div className="flex items-center gap-2 text-gray-500 mb-1">
                     <Activity className="h-4 w-4" />
                     <span className="text-xs font-medium">Complexity</span>
                 </div>
-                <p className="text-lg font-bold text-gray-800">{complexity}</p>
+                <p className="text-lg font-bold text-gray-200">{complexity}</p>
             </div>
 
-            <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+            <div className="bg-[#111]/50 p-4 rounded-xl border border-white/5 shadow-sm hover:border-white/10 transition-colors">
                 <div className="flex items-center gap-2 text-gray-500 mb-1">
                     <Clock className="h-4 w-4" />
                     <span className="text-xs font-medium">Est. Time</span>
                 </div>
-                <p className="text-lg font-bold text-gray-800">{time}</p>
+                <p className="text-lg font-bold text-gray-200">{time}</p>
             </div>
 
-            <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+            <div className="bg-[#111]/50 p-4 rounded-xl border border-white/5 shadow-sm hover:border-white/10 transition-colors">
                 <div className="flex items-center gap-2 text-gray-500 mb-1">
                     <FileCheck className="h-4 w-4" />
                     <span className="text-xs font-medium">Health</span>
                 </div>
-                <p className={`text-lg font-bold ${health.includes('Stable') ? 'text-green-600' : 'text-orange-600'}`}>
+                <p className={`text-lg font-bold ${health.includes('Stable') ? 'text-green-400' : 'text-orange-400'}`}>
                     {health}
                 </p>
             </div>

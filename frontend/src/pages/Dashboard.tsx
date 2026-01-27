@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Loader2, RefreshCw, Plus, Search, Wand2, Copy, Download, FileCode, FileText, BookOpen, CheckCircle2, X } from 'lucide-react';
+import { Loader2, RefreshCw, Plus, Wand2, Copy, Download, FileCode, FileText, BookOpen, CheckCircle2, X } from 'lucide-react';
 import { Toaster, toast } from 'sonner';
 import { jsPDF } from 'jspdf';
 import { Sidebar } from '../components/Sidebar';
@@ -155,7 +155,7 @@ export default function Dashboard() {
     };
 
     return (
-        <div className="flex h-screen bg-slate-950 text-slate-200 selection:bg-blue-500/30 overflow-hidden">
+        <div className="flex h-screen bg-slate-950 text-slate-200 selection:bg-indigo-500/30 overflow-hidden">
             <Sidebar activeView={activeView} onNavigate={setActiveView} onLogout={handleLogout} user={user} />
             <main className="flex-1 ml-64 p-8 overflow-auto relative scrollbar-hide">
                 {activeView === 'repos' && (
@@ -181,11 +181,11 @@ export default function Dashboard() {
                         {/* SELECTED REPO VIEW */}
                         {selectedRepo ? (
                             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                <button onClick={() => setSelectedRepo(null)} className="text-sm text-slate-400 hover:text-blue-400 mb-4 transition">
+                                <button onClick={() => setSelectedRepo(null)} className="text-sm text-slate-400 hover:text-violet-400 mb-4 transition">
                                     ← Back to Dashboard
                                 </button>
                                 <RepoStats repo={selectedRepo} />
-                                <GlassCard className="space-y-8 border-blue-500/20 bg-blue-900/10">
+                                <GlassCard className="space-y-8 border-violet-500/20 bg-violet-900/10">
                                     <div className="flex justify-between items-center">
                                         <div>
                                             <h2 className="text-2xl font-bold text-white">Generate Documentation</h2>
@@ -196,7 +196,7 @@ export default function Dashboard() {
                                         </button>
                                     </div>
 
-                                    <div className="bg-slate-900/50 p-4 rounded-xl border border-white/10 focus-within:ring-2 focus-within:ring-blue-500/50 transition-all">
+                                    <div className="bg-slate-900/50 p-4 rounded-xl border border-white/10 focus-within:ring-2 focus-within:ring-violet-500/50 transition-all">
                                         <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
                                             Custom Instructions (Optional)
                                         </label>
@@ -219,23 +219,23 @@ export default function Dashboard() {
                                                 key={fmt.id}
                                                 onClick={() => toggleFormat(fmt.id)}
                                                 className={`relative p-6 rounded-xl border cursor-pointer transition-all duration-200 group ${selectedFormats.includes(fmt.id)
-                                                    ? 'border-blue-500 bg-blue-600/20'
+                                                    ? 'border-violet-500 bg-violet-600/20'
                                                     : 'border-white/10 hover:border-white/20 hover:bg-white/5'
                                                     }`}
                                             >
-                                                <div className={`mb-4 p-3 rounded-lg w-fit ${selectedFormats.includes(fmt.id) ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400 group-hover:text-white'
+                                                <div className={`mb-4 p-3 rounded-lg w-fit ${selectedFormats.includes(fmt.id) ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white' : 'bg-slate-800 text-slate-400 group-hover:text-white'
                                                     }`}>
                                                     <fmt.icon className="h-6 w-6" />
                                                 </div>
-                                                <h3 className={`font-bold ${selectedFormats.includes(fmt.id) ? 'text-blue-400' : 'text-slate-200'}`}>
+                                                <h3 className={`font-bold ${selectedFormats.includes(fmt.id) ? 'text-violet-400' : 'text-slate-200'}`}>
                                                     {fmt.label}
                                                 </h3>
                                                 <p className="text-sm text-slate-500 mt-1">{fmt.desc}</p>
 
                                                 {/* Checkmark Badge */}
                                                 {selectedFormats.includes(fmt.id) && (
-                                                    <div className="absolute top-4 right-4 text-blue-400">
-                                                        <CheckCircle2 className="h-5 w-5 fill-blue-500/20" />
+                                                    <div className="absolute top-4 right-4 text-violet-400">
+                                                        <CheckCircle2 className="h-5 w-5 fill-violet-500/20" />
                                                     </div>
                                                 )}
                                             </div>
@@ -249,12 +249,12 @@ export default function Dashboard() {
                                     >
                                         {isGenerating ? (
                                             <>
-                                                <Loader2 className="h-5 w-5 animate-spin text-blue-200" />
-                                                <span className="text-blue-100">Processing {selectedRepo.name}...</span>
+                                                <Loader2 className="h-5 w-5 animate-spin text-indigo-200" />
+                                                <span className="text-white">Processing {selectedRepo.name}...</span>
                                             </>
                                         ) : (
                                             <>
-                                                <Wand2 className="h-5 w-5 text-blue-200" />
+                                                <Wand2 className="h-5 w-5 text-indigo-200" />
                                                 <span>Generate Selected Formats</span>
                                             </>
                                         )}

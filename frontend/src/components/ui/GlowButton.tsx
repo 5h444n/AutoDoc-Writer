@@ -3,8 +3,8 @@ export const GlowButton = ({ children, onClick, disabled, className = "", varian
         onClick={onClick}
         disabled={disabled}
         className={`relative px-6 py-4 rounded-xl font-bold transition-all duration-300 disabled:opacity-50 disabled:shadow-none ${variant === "primary"
-                ? "bg-blue-600 text-white hover:bg-blue-500 hover:shadow-[0_0_25px_rgba(37,99,235,0.4)]"
-                : "bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white"
+            ? "bg-gradient-to-r from-indigo-600 to-violet-600 text-white hover:from-indigo-500 hover:to-violet-500 hover:shadow-[0_0_30px_rgba(99,102,241,0.6)]"
+            : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border border-white/5"
             } ${className}`}
     >
         {children}

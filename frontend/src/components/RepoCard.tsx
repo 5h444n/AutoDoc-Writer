@@ -14,28 +14,29 @@ export function RepoCard({ name, description, html_url, stargazers_count, isSele
         <div
             onClick={onClick}
             className={`
-                p-6 rounded-lg shadow-sm border transition-all duration-200 cursor-pointer
+                h-full transition-all duration-200
                 ${isSelected
-                    ? 'border-blue-500 bg-blue-50 shadow-lg scale-[1.02]'
-                    : 'bg-white border-gray-200 hover:shadow-md hover:scale-[1.01]'
+                    ? 'opacity-100'
+                    : 'opacity-80 hover:opacity-100'
                 }
             `}
         >
             <div className="flex justify-between items-start mb-2">
-                <h3 className="text-lg font-bold text-gray-900 truncate pr-4" title={name}>
+                <h3 className="text-lg font-bold text-white truncate pr-4" title={name}>
                     {name}
                 </h3>
                 <a
                     href={html_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-gray-600"
+                    className="text-gray-400 hover:text-white transition-colors"
+                    onClick={(e) => e.stopPropagation()}
                 >
                     <ExternalLink className="w-5 h-5" />
                 </a>
             </div>
 
-            <p className="text-gray-600 text-sm mb-4 line-clamp-2 h-10">
+            <p className="text-gray-400 text-sm mb-4 line-clamp-2 h-10">
                 {description || "No description provided."}
             </p>
 

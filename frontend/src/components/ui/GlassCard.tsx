@@ -6,7 +6,7 @@ export const GlassCard = ({ children, className = "", delay = 0, onClick }: any)
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay, ease: "easeOut" }}
         onClick={onClick}
-        className={`relative bg-slate-900/40 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:border-white/20 transition-colors ${className}`}
+        className={`relative bg-[#0f0f0f]/60 backdrop-blur-xl border border-white/5 rounded-2xl p-6 hover:border-white/10 transition-colors ${className}`}
     >
         {children}
     </motion.div>
