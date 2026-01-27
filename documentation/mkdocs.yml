@@ -7,10 +7,10 @@ theme:
     accent: blue
   features:
     - navigation.tabs
-    - navigation.sections
 
 nav:
-  - Overview: index.md
+  - Introduction: index.md
+  - Features: features.md
   - How to Run It: setup.md
   - How to Use It: usage.md
   - How We Made It: architecture.md

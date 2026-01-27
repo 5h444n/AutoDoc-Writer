@@ -1,38 +1,47 @@
-# Features & Workflow
+# Key Features
 
-## A. GitHub Integration
-[cite_start]**Description:** Establishes a secure connection between the app and your version control system[cite: 80].
+AutoDoc Writer provides a complete suite of tools to automate your documentation workflow.
 
-***Login:** Uses GitHub OAuth for secure login without storing passwords[cite: 22, 72].
-***Monitoring:** Automatically fetches user repositories and allows enabling/disabling monitoring for each[cite: 23, 24].
-***Detection:** Detects new commits or push events to trigger documentation generation[cite: 25].
+## Feature 1: GitHub Integration
+The application connects directly to your version control system.
 
-## B. AI-Powered Documentation
-[cite_start]**Description:** The core engine that transforms code logic into three distinct types of content[cite: 89].
+* **Secure Login:** Uses GitHub OAuth to log in without storing passwords.
+* **Auto-Fetch:** Automatically retrieves all repositories associated with your account.
+* **Monitoring:** Detects new commits or push events in real-time.
 
-1. **Simple Code Explanation:** Plain English descriptions of updated functions, classes, or files[cite: 30].
-2. **Research/Thesis Paragraphs:** Academically formatted paragraphs suitable for reports and thesis writing[cite: 32].
-3. **LaTeX Code Generation:** Generates LaTeX environments ready for editors like Overleaf[cite: 33, 34].
+## Feature 2: AI-Powered Generation
+This is the core engine of the software. It transforms code logic into three distinct formats:
 
-## C. Documentation Viewer
-[cite_start]A clean interface to view and verify generated text[cite: 37, 96].
-***Tab-based Output:** Switch between "Plain Text," "Research Style," and "LaTeX" modes [cite: 39, 41-43].
-***Download Options:** Save outputs in your preferred format[cite: 44].
+1.  **Simple Code Explanation:** Plain English descriptions of what functions or classes do.
+2.  **Research/Thesis Paragraphs:** Formal, academic-style paragraphs suitable for university reports.
+3.  **LaTeX Code Generation:** Generates valid LaTeX environments ready to paste into Overleaf.
 
-## D. Repository Monitoring Dashboard
-[cite_start]A central hub displaying all connected repositories with "Active" or "Inactive" status indicators[cite: 45, 46].It provides a real-time feed of commit activity[cite: 46].
+## Feature 3: Documentation Viewer
+A clean, tab-based interface to review your generated content.
 
-## E. Commit Activity Tracking
-[cite_start]Logs specific updates made by the user[cite: 109].
-*Displays repository name, timestamp, and commit messages[cite: 49].
-*Allows manual triggering of documentation generation for past commits[cite: 112].
+* **View Modes:** Switch between "Plain Text," "Research Style," and "LaTeX" tabs.
+* **Verification:** Allows users to review content before using it in their reports.
 
-## F. Offline-Ready Desktop Experience
-[cite_start]Runs as a desktop-style web app[cite: 51].
-***Local Caching:** Browses locally cached writeups even without an internet connection[cite: 52, 119].
-***Responsive:** Smooth, lightweight UI[cite: 52].
+## Feature 4: Repository Dashboard
+A central hub for managing your projects.
 
-## G. Export & Sharing
-[cite_start]Extract generated documentation for external use[cite: 129].
-***Formats:** Export as Markdown, PDF, LaTeX, or Plain Text [cite: 60-67].
-***One-Click Copy:** Quickly paste text into other editors[cite: 68].
+* **Status Indicators:** Visual tags showing which repositories are "Active" (being monitored) or "Inactive".
+* **Activity Feed:** Shows real-time commit activity across your connected projects.
+
+## Feature 5: Commit Tracking
+Granular tracking of your work history.
+
+* **History Log:** Lists recent commits with timestamps and messages.
+* **Manual Trigger:** Option to generate documentation for past commits you might have missed.
+
+## Feature 6: Offline-Ready Experience
+The app runs locally on your desktop.
+
+* **Local Caching:** Previously generated writeups are saved locally, so you can view them without internet.
+* **Privacy:** Data is processed only on user request and stored on your machine.
+
+## Feature 7: Export Options
+Easily move your documentation to other tools.
+
+* **Formats:** Export to Markdown, PDF, LaTeX, or Plain Text.
+* **One-Click Copy:** Quickly copy generated text to your clipboard.
