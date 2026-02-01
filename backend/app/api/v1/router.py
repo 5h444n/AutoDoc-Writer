@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1.endpoints import auth, repos, ai, repo_docs, webhooks
+from app.api.v1.endpoints import auth, repos, ai, docs, repo_docs, webhooks
 
 api_router = APIRouter()
 
@@ -15,5 +15,8 @@ api_router.include_router(ai.router, prefix="/ai", tags=["AI"])
 # 4. Connect Repo Docs
 api_router.include_router(repo_docs.router, prefix="/repo-docs", tags=["RepoDocs"])
 
-# 5. Webhooks (no auth)
+# 5. Connect Docs
+api_router.include_router(docs.router, prefix="/docs", tags=["Docs"])
+
+# 6. Webhooks (no auth)
 api_router.include_router(webhooks.router, prefix="/webhooks", tags=["Webhooks"])
