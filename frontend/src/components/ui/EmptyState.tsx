@@ -1,9 +1,9 @@
-import React from "react";
-import { type LucideIcon } from "lucide-react";
-import { Button } from "./Button";
-import { cn } from "../../lib/utils";
+import React from 'react';
+import { LucideIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
-type EmptyStateProps = {
+interface EmptyStateProps {
   icon: LucideIcon;
   title: string;
   description: string;
@@ -12,14 +12,14 @@ type EmptyStateProps = {
     onClick: () => void;
   };
   className?: string;
-};
+}
 
 export function EmptyState({ icon: Icon, title, description, action, className }: EmptyStateProps) {
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center py-16 px-4 text-center animate-fade-in",
-        className,
+        'flex flex-col items-center justify-center py-16 px-4 text-center animate-fade-in',
+        className
       )}
     >
       <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4 animate-bounce-soft">

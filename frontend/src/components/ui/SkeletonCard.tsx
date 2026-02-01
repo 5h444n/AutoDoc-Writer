@@ -1,14 +1,14 @@
-import React from "react";
-import { cn } from "../../lib/utils";
+import React from 'react';
+import { cn } from '@/lib/utils';
 
-type SkeletonCardProps = {
+interface SkeletonCardProps {
   className?: string;
   lines?: number;
-};
+}
 
 export function SkeletonCard({ className, lines = 3 }: SkeletonCardProps) {
   return (
-    <div className={cn("p-4 rounded-lg border border-border bg-card animate-fade-in", className)}>
+    <div className={cn('p-4 rounded-lg border border-border bg-card animate-fade-in', className)}>
       <div className="flex items-center gap-3 mb-4">
         <div className="w-10 h-10 rounded-full shimmer" />
         <div className="flex-1 space-y-2">
