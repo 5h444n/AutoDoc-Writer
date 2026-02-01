@@ -1,76 +1,68 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-type FormatStyle = "plainText" | "research" | "latex";
-
-type AppContextValue = {
+interface AppContextType {
   isOffline: boolean;
   setIsOffline: (offline: boolean) => void;
   isDarkMode: boolean;
   toggleDarkMode: () => void;
-  defaultFormat: FormatStyle;
-  setDefaultFormat: (format: FormatStyle) => void;
+  defaultFormat: 'plainText' | 'research' | 'latex';
+  setDefaultFormat: (format: 'plainText' | 'research' | 'latex') => void;
   textComplexity: number;
   setTextComplexity: (complexity: number) => void;
   notificationsEnabled: boolean;
   setNotificationsEnabled: (enabled: boolean) => void;
   cacheEnabled: boolean;
   setCacheEnabled: (enabled: boolean) => void;
-};
+}
 
-const AppContext = createContext<AppContextValue | undefined>(undefined);
+const AppContext = createContext<AppContextType | undefined>(undefined);
 
-export function AppProvider({ children }: { children: React.ReactNode }) {
+export function AppProvider({ children }: { children: ReactNode }) {
   const [isOffline, setIsOffline] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
-  const [defaultFormat, setDefaultFormat] = useState<FormatStyle>("plainText");
+  const [defaultFormat, setDefaultFormat] = useState<'plainText' | 'research' | 'latex'>('plainText');
   const [textComplexity, setTextComplexity] = useState(50);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [cacheEnabled, setCacheEnabled] = useState(true);
 
   const toggleDarkMode = () => {
-    setIsDarkMode((prev) => !prev);
+    setIsDarkMode(!isDarkMode);
+    document.documentElement.classList.toggle('dark');
   };
 
-  useEffect(() => {
+  // Initialize dark mode
+  React.useEffect(() => {
     if (isDarkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
+      document.documentElement.classList.add('dark');
     }
-  }, [isDarkMode]);
+  }, []);
 
-  const value = useMemo(
-    () => ({
-      isOffline,
-      setIsOffline,
-      isDarkMode,
-      toggleDarkMode,
-      defaultFormat,
-      setDefaultFormat,
-      textComplexity,
-      setTextComplexity,
-      notificationsEnabled,
-      setNotificationsEnabled,
-      cacheEnabled,
-      setCacheEnabled,
-    }),
-    [
-      isOffline,
-      isDarkMode,
-      defaultFormat,
-      textComplexity,
-      notificationsEnabled,
-      cacheEnabled,
-    ],
+  return (
+    <AppContext.Provider
+      value={{
+        isOffline,
+        setIsOffline,
+        isDarkMode,
+        toggleDarkMode,
+        defaultFormat,
+        setDefaultFormat,
+        textComplexity,
+        setTextComplexity,
+        notificationsEnabled,
+        setNotificationsEnabled,
+        cacheEnabled,
+        setCacheEnabled,
+      }}
+    >
+      {children}
+    </AppContext.Provider>
   );
-
-  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
 
 export function useApp() {
   const context = useContext(AppContext);
-  if (!context) {
-    throw new Error("useApp must be used within an AppProvider");
+  if (context === undefined) {
+    throw new Error('useApp must be used within an AppProvider');
   }
   return context;
 }
