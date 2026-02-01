@@ -1,9 +1,30 @@
+import base64
 import requests
 from fastapi import HTTPException
 from fastapi.responses import RedirectResponse
 from app.core.config import settings
 
 class GitHubService:
+    @staticmethod
+    def _headers(access_token: str):
+        return {
+            "Authorization": f"Bearer {access_token}",
+            "Accept": "application/vnd.github+json",
+        }
+
+    @staticmethod
+    def _raise_for_status(response: requests.Response, context: str) -> None:
+        if response.status_code < 400:
+            return
+        try:
+            detail = response.json().get("message", response.text)
+        except Exception:
+            detail = response.text
+        raise HTTPException(
+            status_code=400,
+            detail=f"{context}: HTTP {response.status_code} - {detail}"
+        )
+
     @staticmethod
     def get_login_redirect():
         """
@@ -94,3 +115,37 @@ class GitHubService:
             }
             for repo in all_repos
         ]
+
+    @staticmethod
+    def get_repo_tree(access_token: str, repo_full_name: str, ref: str = "HEAD"):
+        """Fetches the repository tree (optionally recursive)."""
+        url = f"https://api.github.com/repos/{repo_full_name}/git/trees/{ref}"
+        headers = GitHubService._headers(access_token)
+        params = {"recursive": "1"}
+        response = requests.get(url, headers=headers, params=params)
+        GitHubService._raise_for_status(response, "Failed to fetch repository tree")
+        return response.json().get("tree", [])
+
+    @staticmethod
+    def get_file_content(access_token: str, repo_full_name: str, path: str, ref: str = "HEAD"):
+        """Fetches a file's content (base64 decoded) and sha via GitHub contents API."""
+        url = f"https://api.github.com/repos/{repo_full_name}/contents/{path}"
+        headers = GitHubService._headers(access_token)
+        params = {"ref": ref} if ref else None
+        response = requests.get(url, headers=headers, params=params)
+        GitHubService._raise_for_status(response, "Failed to fetch file content")
+        data = response.json()
+        if isinstance(data, list):
+            return None, None
+        content = data.get("content")
+        encoding = data.get("encoding")
+        sha = data.get("sha")
+        if not content:
+            return None, sha
+        if encoding == "base64":
+            try:
+                decoded = base64.b64decode(content).decode("utf-8", errors="ignore")
+            except Exception:
+                return None, sha
+            return decoded, sha
+        return str(content), sha
