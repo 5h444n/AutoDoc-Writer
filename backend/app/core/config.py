@@ -11,6 +11,11 @@ class Settings(BaseSettings):
     # We add these here so Pydantic doesn't complain about "Extra inputs"
     ENV: str = "development"
     GEMINI_API_KEY: Optional[str] = None
+    GROQ_API_KEY: Optional[str] = None
+    GROQ_MODEL: str = "llama-3.3-70b-versatile"
+    PERPLEXITY_API_KEY: Optional[str] = None
+    PERPLEXITY_MODEL: str = "sonar-pro"
+    AI_PROVIDER_ORDER: str = "groq,perplexity,gemini"
 
     # --- Security ---
     SECRET_KEY: str = "change_this_in_production"
