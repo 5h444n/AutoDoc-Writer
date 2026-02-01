@@ -1,10 +1,6 @@
-import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
-
-type User = {
-  name?: string | null;
-  username?: string | null;
-  avatar?: string | null;
-};
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { fetchCurrentUser, loginWithGitHub } from "../lib/api";
+import type { User } from "../lib/types";
 
 type AuthContextValue = {
   user: User | null;
@@ -12,27 +8,37 @@ type AuthContextValue = {
   isLoading: boolean;
   login: () => void;
   logout: () => void;
+  setAuthToken: (token: string | null) => void;
 };
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(() => {
-    const username = localStorage.getItem("username");
-    if (!username) {
-      return null;
+  const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(() => localStorage.getItem("auth_token"));
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!token) {
+      setUser(null);
+      setIsLoading(false);
+      return;
     }
-    return {
-      username,
-      name: localStorage.getItem("name") || username,
-      avatar: localStorage.getItem("avatar"),
-    };
-  });
-  const [isLoading, setIsLoading] = useState(false);
+
+    setIsLoading(true);
+    fetchCurrentUser()
+      .then((profile) => setUser(profile))
+      .catch(() => {
+        localStorage.removeItem("auth_token");
+        setToken(null);
+        setUser(null);
+      })
+      .finally(() => setIsLoading(false));
+  }, [token]);
 
   const login = useCallback(() => {
     setIsLoading(true);
-    window.location.href = "http://localhost:8000/api/v1/auth/login";
+    loginWithGitHub();
   }, []);
 
   const logout = useCallback(() => {
@@ -40,7 +46,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem("username");
     localStorage.removeItem("name");
     localStorage.removeItem("avatar");
+    setToken(null);
     setUser(null);
+  }, []);
+
+  const setAuthToken = useCallback((newToken: string | null) => {
+    if (newToken) {
+      localStorage.setItem("auth_token", newToken);
+    } else {
+      localStorage.removeItem("auth_token");
+    }
+    setToken(newToken);
   }, []);
 
   const value = useMemo(
@@ -50,8 +66,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isLoading,
       login,
       logout,
+      setAuthToken,
     }),
-    [user, isLoading, login, logout],
+    [user, isLoading, login, logout, setAuthToken],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

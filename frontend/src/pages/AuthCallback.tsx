@@ -1,31 +1,31 @@
-import { useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
 
 export default function AuthCallback() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { setAuthToken } = useAuth();
 
   useEffect(() => {
-    const token = searchParams.get("token");
-    const username = searchParams.get("username");
+    const token = searchParams.get('token');
+    const username = searchParams.get('username');
 
     if (token) {
-      localStorage.setItem("auth_token", token);
+      setAuthToken(token);
       if (username) {
-        localStorage.setItem("username", username);
+        localStorage.setItem('username', username);
       }
-      // Give a small delay or immediate redirect
-      navigate("/dashboard", { replace: true });
+      navigate('/dashboard', { replace: true });
     } else {
-      // Failed login or missing params
-      navigate("/", { replace: true });
+      navigate('/', { replace: true });
     }
-  }, [searchParams, navigate]);
+  }, [navigate, searchParams, setAuthToken]);
 
   return (
-    <div className="min-h-screen bg-[#0f172a] flex flex-col items-center justify-center text-white">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500 mb-4"></div>
-      <p className="text-slate-400">Authenticating...</p>
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center text-foreground">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mb-4" />
+      <p className="text-muted-foreground">Authenticating...</p>
     </div>
   );
 }
