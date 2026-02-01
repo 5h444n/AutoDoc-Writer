@@ -10,7 +10,7 @@ function cn(...inputs: ClassValue[]) {
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   isLoading?: boolean;
   variant?: "primary" | "outline" | "ghost";
-  size?: "default" | "sm";
+  size?: "default" | "sm" | "icon";
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -40,6 +40,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const sizes = {
       default: "py-3.5 px-8 text-sm",
       sm: "py-2 px-4 text-xs",
+      icon: "h-9 w-9 p-0",
     };
 
     return (
@@ -48,8 +49,9 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={isLoading || disabled}
         className={cn(
           // Layout & Centering
-          "relative flex w-full items-center justify-center gap-2",
-          "text-center align-middle rounded-xl font-semibold transition-all duration-300",
+          "relative flex items-center justify-center gap-2",
+          size === "icon" ? "rounded-full" : "w-full rounded-xl",
+          "text-center align-middle font-semibold transition-all duration-300",
           "disabled:opacity-50 disabled:cursor-not-allowed",
 
           variants[variant],
