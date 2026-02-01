@@ -36,6 +36,9 @@ class Settings(BaseSettings):
     # --- Database ---
     DATABASE_URL: str = "sqlite:///./autodoc.db"
 
+    # --- Webhooks ---
+    GITHUB_WEBHOOK_SECRET: Optional[str] = None
+
     # Pydantic v2 configuration
     model_config = ConfigDict(
         # 1. Get the directory of THIS file (backend/app/core/config.py)
