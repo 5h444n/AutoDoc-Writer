@@ -18,6 +18,7 @@ class User(Base):
 
     # --- ADD THIS LINE --- TANIM
     repos = relationship("Repository", back_populates="owner")
+    docs = relationship("Documentation", back_populates="owner")
 
     @hybrid_property
     def access_token(self) -> Optional[str]:
