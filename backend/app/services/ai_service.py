@@ -28,7 +28,6 @@ _PROVIDERS = ("groq", "perplexity", "gemini")
 _simple_cache: Dict[str, Any] = {}
 _DEFAULT_CACHE_TTL = 60 * 60  # 1 hour
 
-
 def _configure() -> None:
     global _configured
     if _configured:

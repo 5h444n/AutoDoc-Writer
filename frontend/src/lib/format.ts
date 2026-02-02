@@ -1,4 +1,4 @@
-﻿import { formatDistanceToNowStrict, isValid, parseISO } from "date-fns";
+import { formatDistanceToNowStrict, isValid, parseISO } from "date-fns";
 
 const LANGUAGE_COLORS: Record<string, string> = {
   typescript: "#3178c6",
@@ -40,6 +40,35 @@ export function formatRelativeTime(value?: string | number | Date | null): strin
   }
 
   return formatDistanceToNowStrict(date, { addSuffix: true });
+}
+
+function toDate(value?: string | number | Date | null): Date | null {
+  if (!value) return null;
+  if (value instanceof Date) return value;
+  if (typeof value === "number") return new Date(value);
+  const parsed = Date.parse(value);
+  if (Number.isNaN(parsed)) return null;
+  return new Date(parsed);
+}
+
+export function formatRelativeTimeSimple(value?: string | number | Date | null): string {
+  const date = toDate(value);
+  if (!date) return "Unknown";
+
+  const diffMs = Date.now() - date.getTime();
+  const seconds = Math.floor(diffMs / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  const months = Math.floor(days / 30);
+  const years = Math.floor(days / 365);
+
+  if (seconds < 60) return `${seconds}s ago`;
+  if (minutes < 60) return `${minutes}m ago`;
+  if (hours < 24) return `${hours}h ago`;
+  if (days < 30) return `${days}d ago`;
+  if (months < 12) return `${months}mo ago`;
+  return `${years}y ago`;
 }
 
 export function getLanguageColor(language?: string | null): string {

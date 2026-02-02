@@ -73,7 +73,7 @@ def callback(code: str, db: Session = Depends(get_db)):
                 name=repo_data["name"],
                 full_name=repo_full_name,
                 url=repo_data["url"],
-                last_updated=repo_data.get("updated_at"),
+                last_updated=repo_data.get("updated_at") or repo_data.get("last_updated"),
                 owner_id=user.id,
             )
             db.add(new_repo)

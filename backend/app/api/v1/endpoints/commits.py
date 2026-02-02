@@ -20,6 +20,11 @@ def list_commits(
     """
     Returns commits for a repository. If no repo is provided, returns recent
     commits across monitored repositories (or all repos if none are monitored).
+    
+    Query Parameters:
+    - repo_full_name: Optional repository in format 'owner/repo' 
+    - per_page: Number of commits per page (1-50, default 20)
+    - include_stats: Include file change statistics (default true)
     """
     if not current_user.access_token:
         raise HTTPException(status_code=401, detail="Missing GitHub access token")

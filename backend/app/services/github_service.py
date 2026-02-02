@@ -136,7 +136,42 @@ class GitHubService:
         ]
 
     @staticmethod
+    def get_repo_tree(access_token: str, repo_full_name: str, ref: str = "HEAD"):
+        """Fetches the repository tree (optionally recursive)."""
+        url = f"https://api.github.com/repos/{repo_full_name}/git/trees/{ref}"
+        headers = GitHubService._headers(access_token)
+        params = {"recursive": "1"}
+        response = GitHubService._request("get", url, headers=headers, params=params)
+        GitHubService._raise_for_status(response, "Failed to fetch repository tree")
+        return response.json().get("tree", [])
+
+    @staticmethod
+    def get_file_content(access_token: str, repo_full_name: str, path: str, ref: str = "HEAD"):
+        """Fetches a file's content (base64 decoded) and sha via GitHub contents API."""
+        url = f"https://api.github.com/repos/{repo_full_name}/contents/{path}"
+        headers = GitHubService._headers(access_token)
+        params = {"ref": ref} if ref else None
+        response = GitHubService._request("get", url, headers=headers, params=params)
+        GitHubService._raise_for_status(response, "Failed to fetch file content")
+        data = response.json()
+        if isinstance(data, list):
+            return None, None
+        content = data.get("content")
+        encoding = data.get("encoding")
+        sha = data.get("sha")
+        if not content:
+            return None, sha
+        if encoding == "base64":
+            try:
+                decoded = base64.b64decode(content).decode("utf-8", errors="ignore")
+            except Exception:
+                return None, sha
+            return decoded, sha
+        return str(content), sha
+
+    @staticmethod
     def get_repo_commit_count(access_token: str, repo_full_name: str) -> int:
+        """Get total commit count for a repository."""
         url = f"https://api.github.com/repos/{repo_full_name}/commits"
         headers = GitHubService._headers(access_token)
         response = GitHubService._request("get", url, headers=headers, params={"per_page": 1})
@@ -159,6 +194,7 @@ class GitHubService:
 
     @staticmethod
     def get_commit_detail(access_token: str, repo_full_name: str, sha: str, include_patch: bool = True):
+        """Get detailed information for a specific commit."""
         url = f"https://api.github.com/repos/{repo_full_name}/commits/{sha}"
         headers = GitHubService._headers(access_token)
         response = GitHubService._request("get", url, headers=headers)
@@ -173,6 +209,7 @@ class GitHubService:
 
     @staticmethod
     def get_repo_commits(access_token: str, repo_full_name: str, per_page: int = 20, include_stats: bool = True):
+        """Fetch commits from a repository with optional stats."""
         url = f"https://api.github.com/repos/{repo_full_name}/commits"
         headers = GitHubService._headers(access_token)
         params = {"per_page": per_page}
@@ -223,37 +260,3 @@ class GitHubService:
             results.append(entry)
 
         return results
-
-    @staticmethod
-    def get_repo_tree(access_token: str, repo_full_name: str, ref: str = "HEAD"):
-        """Fetches the repository tree (optionally recursive)."""
-        url = f"https://api.github.com/repos/{repo_full_name}/git/trees/{ref}"
-        headers = GitHubService._headers(access_token)
-        params = {"recursive": "1"}
-        response = GitHubService._request("get", url, headers=headers, params=params)
-        GitHubService._raise_for_status(response, "Failed to fetch repository tree")
-        return response.json().get("tree", [])
-
-    @staticmethod
-    def get_file_content(access_token: str, repo_full_name: str, path: str, ref: str = "HEAD"):
-        """Fetches a file's content (base64 decoded) and sha via GitHub contents API."""
-        url = f"https://api.github.com/repos/{repo_full_name}/contents/{path}"
-        headers = GitHubService._headers(access_token)
-        params = {"ref": ref} if ref else None
-        response = GitHubService._request("get", url, headers=headers, params=params)
-        GitHubService._raise_for_status(response, "Failed to fetch file content")
-        data = response.json()
-        if isinstance(data, list):
-            return None, None
-        content = data.get("content")
-        encoding = data.get("encoding")
-        sha = data.get("sha")
-        if not content:
-            return None, sha
-        if encoding == "base64":
-            try:
-                decoded = base64.b64decode(content).decode("utf-8", errors="ignore")
-            except Exception:
-                return None, sha
-            return decoded, sha
-        return str(content), sha

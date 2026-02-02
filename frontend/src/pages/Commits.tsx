@@ -404,24 +404,24 @@ export default function Commits() {
                 </span>
               </div>
 
-                  <Button
-                    className="w-full gap-2"
-                    onClick={() => handleGenerate(selectedCommit)}
-                    disabled={isGenerating}
-                  >
-                    {isGenerating ? (
+              <Button
+                className="w-full gap-2"
+                onClick={() => handleGenerate(selectedCommit)}
+                disabled={isGenerating}
+              >
+                {isGenerating ? (
                   <>
                     <Sparkles className="w-4 h-4 animate-spin" />
                     <span>Generating</span>
                     <span className="typing-dots" />
                   </>
-                    ) : (
-                      <>
-                        <Sparkles className="w-4 h-4" />
-                        Generate Documentation ({formatLabel})
-                      </>
-                    )}
-                  </Button>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4" />
+                    Generate Documentation ({formatLabel})
+                  </>
+                )}
+              </Button>
             </div>
           )}
         </DialogContent>
