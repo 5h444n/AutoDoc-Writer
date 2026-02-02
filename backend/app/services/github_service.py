@@ -5,6 +5,17 @@ from fastapi.responses import RedirectResponse
 from app.core.config import settings
 
 class GitHubService:
+    REQUEST_TIMEOUT = (5, 20)
+
+    @staticmethod
+    def _request(method: str, url: str, **kwargs) -> requests.Response:
+        try:
+            return requests.request(method, url, timeout=GitHubService.REQUEST_TIMEOUT, **kwargs)
+        except requests.Timeout:
+            raise HTTPException(status_code=504, detail="GitHub API request timed out")
+        except requests.RequestException as exc:
+            raise HTTPException(status_code=502, detail=f"GitHub API request failed: {exc}")
+
     @staticmethod
     def _headers(access_token: str):
         return {
@@ -63,41 +74,43 @@ class GitHubService:
     def get_user_profile(access_token: str) -> str:
         """Fetches the GitHub username using the access token."""
         url = "https://api.github.com/user"
-        headers = {
-            "Authorization": f"Bearer {access_token}",
-            "Accept": "application/json"
-        }
-        
-        response = requests.get(url, headers=headers)
-        if response.status_code != 200:
-            try:
-                error_detail = response.json().get("message", response.text)
-            except Exception:
-                error_detail = response.text
-            raise HTTPException(
-                status_code=400,
-                detail=f"Failed to fetch user profile: HTTP {response.status_code} - {error_detail}"
-            )
-            
+        headers = GitHubService._headers(access_token)
+
+        response = GitHubService._request("get", url, headers=headers)
+        GitHubService._raise_for_status(response, "Failed to fetch user profile")
+
         return response.json().get("login")
+
+    @staticmethod
+    def get_user_details(access_token: str):
+        """Fetches the GitHub user details using the access token."""
+        url = "https://api.github.com/user"
+        headers = GitHubService._headers(access_token)
+
+        response = GitHubService._request("get", url, headers=headers)
+        GitHubService._raise_for_status(response, "Failed to fetch user profile")
+        data = response.json()
+
+        return {
+            "username": data.get("login"),
+            "name": data.get("name") or data.get("login"),
+            "avatar": data.get("avatar_url"),
+            "email": data.get("email"),
+        }
 
     @staticmethod
     def get_user_repos(access_token: str):
         """Fetches all repositories for the logged-in user."""
         url = "https://api.github.com/user/repos"
-        headers = {
-            "Authorization": f"Bearer {access_token}",
-            "Accept": "application/json"
-        }
-        
+        headers = GitHubService._headers(access_token)
+
         per_page = 100
         params = {"sort": "updated", "per_page": per_page, "page": 1}
-        
+
         all_repos = []
         while True:
-            response = requests.get(url, headers=headers, params=params)
-            if response.status_code != 200:
-                raise HTTPException(status_code=400, detail="Failed to fetch repositories")
+            response = GitHubService._request("get", url, headers=headers, params=params)
+            GitHubService._raise_for_status(response, "Failed to fetch repositories")
             repos = response.json()
             if not repos:
                 break
@@ -105,13 +118,18 @@ class GitHubService:
             if len(repos) < per_page:
                 break
             params["page"] += 1
-        
-        # Return a simplified list of dicts
+
         return [
             {
-                "name": repo["name"],
-                "url": repo["html_url"],
-                "last_updated": repo["updated_at"]
+                "id": repo.get("id"),
+                "name": repo.get("name"),
+                "full_name": repo.get("full_name"),
+                "url": repo.get("html_url"),
+                "description": repo.get("description") or "",
+                "language": repo.get("language") or "Unknown",
+                "stars": repo.get("stargazers_count", 0),
+                "updated_at": repo.get("updated_at"),
+                "pushed_at": repo.get("pushed_at"),
             }
             for repo in all_repos
         ]
@@ -132,7 +150,7 @@ class GitHubService:
         url = f"https://api.github.com/repos/{repo_full_name}/contents/{path}"
         headers = GitHubService._headers(access_token)
         params = {"ref": ref} if ref else None
-        response = requests.get(url, headers=headers, params=params)
+        response = GitHubService._request("get", url, headers=headers, params=params)
         GitHubService._raise_for_status(response, "Failed to fetch file content")
         data = response.json()
         if isinstance(data, list):
@@ -149,3 +167,96 @@ class GitHubService:
                 return None, sha
             return decoded, sha
         return str(content), sha
+
+    @staticmethod
+    def get_repo_commit_count(access_token: str, repo_full_name: str) -> int:
+        """Get total commit count for a repository."""
+        url = f"https://api.github.com/repos/{repo_full_name}/commits"
+        headers = GitHubService._headers(access_token)
+        response = GitHubService._request("get", url, headers=headers, params={"per_page": 1})
+        GitHubService._raise_for_status(response, "Failed to fetch commit count")
+
+        link_header = response.headers.get("Link")
+        if not link_header:
+            return len(response.json())
+
+        for part in link_header.split(","):
+            if 'rel="last"' in part:
+                url_part = part.split(";")[0].strip().strip("<>")
+                if "page=" in url_part:
+                    try:
+                        page_str = url_part.split("page=")[-1].split("&")[0]
+                        return int(page_str)
+                    except ValueError:
+                        return 0
+        return 0
+
+    @staticmethod
+    def get_commit_detail(access_token: str, repo_full_name: str, sha: str, include_patch: bool = True):
+        """Get detailed information for a specific commit."""
+        url = f"https://api.github.com/repos/{repo_full_name}/commits/{sha}"
+        headers = GitHubService._headers(access_token)
+        response = GitHubService._request("get", url, headers=headers)
+        GitHubService._raise_for_status(response, "Failed to fetch commit detail")
+
+        data = response.json()
+        if not include_patch:
+            for file_info in data.get("files", []):
+                file_info.pop("patch", None)
+                file_info.pop("raw_url", None)
+        return data
+
+    @staticmethod
+    def get_repo_commits(access_token: str, repo_full_name: str, per_page: int = 20, include_stats: bool = True):
+        """Fetch commits from a repository with optional stats."""
+        url = f"https://api.github.com/repos/{repo_full_name}/commits"
+        headers = GitHubService._headers(access_token)
+        params = {"per_page": per_page}
+        response = GitHubService._request("get", url, headers=headers, params=params)
+        GitHubService._raise_for_status(response, "Failed to fetch commits")
+
+        commits = response.json()
+        results = []
+        for item in commits:
+            sha = item.get("sha")
+            commit_info = item.get("commit") or {}
+            author_info = commit_info.get("author") or {}
+            user_info = item.get("author") or {}
+            author_name = author_info.get("name") or user_info.get("login") or "Unknown"
+
+            entry = {
+                "id": sha,
+                "sha": sha[:7] if sha else "",
+                "full_sha": sha,
+                "message": commit_info.get("message") or "",
+                "author": author_name,
+                "author_avatar": user_info.get("avatar_url"),
+                "timestamp": author_info.get("date"),
+                "repo_full_name": repo_full_name,
+                "repo_name": repo_full_name.split("/")[-1] if repo_full_name else "",
+            }
+
+            if include_stats and sha:
+                detail = GitHubService.get_commit_detail(
+                    access_token, repo_full_name, sha, include_patch=False
+                )
+                stats = detail.get("stats", {})
+                files = detail.get("files", []) or []
+                entry.update({
+                    "files_changed": len(files),
+                    "additions": stats.get("additions", 0),
+                    "deletions": stats.get("deletions", 0),
+                    "files": [
+                        {
+                            "filename": f.get("filename"),
+                            "additions": f.get("additions", 0),
+                            "deletions": f.get("deletions", 0),
+                        }
+                        for f in files
+                    ],
+                })
+
+            results.append(entry)
+
+        return results
+
