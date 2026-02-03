@@ -40,10 +40,9 @@ class GitHubService:
     def get_login_redirect():
         """
         Generates the GitHub OAuth redirect URL.
-        This was the missing function causing your error.
         """
         url = (
-            f"https://github.com/login/oauth/authorize"
+            f"{settings.GITHUB_AUTH_URL}"
             f"?client_id={settings.GITHUB_CLIENT_ID}"
             f"&redirect_uri={settings.REDIRECT_URI}"
             f"&scope=repo"
@@ -53,21 +52,21 @@ class GitHubService:
     @staticmethod
     def exchange_code_for_token(code: str) -> str:
         """Exchanges the temporary code for a permanent access token."""
-        url = "https://github.com/login/oauth/access_token"
+        url = settings.GITHUB_TOKEN_URL
         headers = {"Accept": "application/json"}
         data = {
             "client_id": settings.GITHUB_CLIENT_ID,
             "client_secret": settings.GITHUB_CLIENT_SECRET,
             "code": code,
-            "redirect_uri": settings.REDIRECT_URI
+            "redirect_uri": settings.REDIRECT_URI,
         }
-        
-        response = requests.post(url, headers=headers, data=data)
+
+        response = GitHubService._request("post", url, headers=headers, data=data)
         response_data = response.json()
-        
+
         if "error" in response_data:
-            raise HTTPException(status_code=400, detail=response_data["error_description"])
-            
+            raise HTTPException(status_code=400, detail=response_data.get("error_description"))
+
         return response_data.get("access_token")
 
     @staticmethod

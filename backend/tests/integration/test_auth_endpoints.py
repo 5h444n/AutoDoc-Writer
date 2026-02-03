@@ -3,9 +3,14 @@ from app.core.config import settings
 from app.models.user import User
 
 
-def test_login_redirect_uses_settings(client):
-    resp = client.get("/api/v1/auth/login")
-    assert resp.status_code in (302, 307)
+from fastapi.responses import RedirectResponse
+from app.services.github_service import GitHubService
+
+
+def test_login_redirect_uses_settings():
+    # Call the service directly to avoid following external redirects
+    resp = GitHubService.get_login_redirect()
+    assert isinstance(resp, RedirectResponse)
     loc = resp.headers.get("location")
     assert loc is not None
     assert settings.GITHUB_AUTH_URL in loc
