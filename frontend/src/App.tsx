@@ -16,11 +16,6 @@ import Export from "./pages/Export";
 import Settings from "./pages/Settings";
 import Help from "./pages/Help";
 import NotFound from "./pages/NotFound";
-import LoginPage from "./pages/Login";
-import DashboardLayout from "./layouts/DashboardLayout";
-import RepositoriesPage from "./pages/Repositories";
-import PlaygroundPage from "./pages/Playground";
-import SettingsPage from "./pages/Settings";
 
 const queryClient = new QueryClient();
 
@@ -74,7 +69,6 @@ function AppRoutes() {
           </AuthRedirect>
         }
       />
-      <Route path="/login" element={<LoginPage />} />
 
       <Route path="/auth/callback" element={<AuthCallback />} />
       
@@ -93,14 +87,6 @@ function AppRoutes() {
         <Route path="/export" element={<Export />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/help" element={<Help />} />
-      </Route>
-      
-      {/* Protected Dashboard Routes */}
-      <Route path="/dashboard" element={<DashboardLayout />}>
-        {/* Index route renders when user hits /dashboard */}
-        <Route index element={<RepositoriesPage />} />
-        <Route path="playground" element={<PlaygroundPage />} />
-        <Route path="settings" element={<SettingsPage />} />
       </Route>
       
       {/* Catch-all */}
