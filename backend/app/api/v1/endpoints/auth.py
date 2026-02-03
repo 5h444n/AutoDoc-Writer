@@ -5,8 +5,10 @@ from app.services.github_service import GitHubService
 from app.db.session import get_db
 from app.models.user import User
 from app.models.repository import Repository
+from app.core.config import settings
 
 router = APIRouter()
+
 
 @router.get("/login")
 def login():
