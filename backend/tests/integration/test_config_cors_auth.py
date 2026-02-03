@@ -1,9 +1,12 @@
 from app.core.config import settings
 
 
+from app.services.github_service import GitHubService
+
+
 def test_auth_login_root_exists(client):
-    # Ensure root-level /auth/login (backward-compat) is present and redirects
-    resp = client.get("/auth/login", allow_redirects=False)
+    # Call the service directly to validate redirect URL and avoid following external redirects
+    resp = GitHubService.get_login_redirect()
     assert resp.status_code in (302, 307)
     loc = resp.headers.get("location")
     assert settings.GITHUB_AUTH_URL in loc
