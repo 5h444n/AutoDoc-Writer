@@ -40,10 +40,9 @@ class GitHubService:
     def get_login_redirect():
         """
         Generates the GitHub OAuth redirect URL.
-        This was the missing function causing your error.
         """
         url = (
-            f"https://github.com/login/oauth/authorize"
+            f"{settings.GITHUB_AUTH_URL}"
             f"?client_id={settings.GITHUB_CLIENT_ID}"
             f"&redirect_uri={settings.REDIRECT_URI}"
             f"&scope=repo"
@@ -69,6 +68,7 @@ class GitHubService:
             # Use a safe fallback for error detail
             detail = response_data.get("error_description") or response_data.get("error") or "Unknown error"
             raise HTTPException(status_code=400, detail=detail)
+            raise HTTPException(status_code=400, detail=response_data.get("error_description"))
 
         return response_data.get("access_token")
 
@@ -142,7 +142,7 @@ class GitHubService:
         url = f"https://api.github.com/repos/{repo_full_name}/git/trees/{ref}"
         headers = GitHubService._headers(access_token)
         params = {"recursive": "1"}
-        response = requests.get(url, headers=headers, params=params)
+        response = GitHubService._request("get", url, headers=headers, params=params)
         GitHubService._raise_for_status(response, "Failed to fetch repository tree")
         return response.json().get("tree", [])
 
