@@ -34,22 +34,29 @@ _ensure_repo_columns()
 app = FastAPI(title=settings.PROJECT_NAME)
 
 # [Roadmap Step 8] Enable CORS for Frontend
-# We explicitly add localhost:3000 (React) and localhost:5173 (Vite/Next.js)
-origins = [
+# Use configured BACKEND_CORS_ORIGINS (comma-separated list) from settings for flexibility.
+origins = getattr(settings, "BACKEND_CORS_ORIGINS", [
     "http://localhost:3000",
     "http://localhost:5173",
-    "http://localhost:8000",
-]
+])
+
+# If origins are supplied as a comma-separated env string, normalize to list
+if isinstance(origins, str):
+    origins = [o.strip() for o in origins.split(",") if o.strip()]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,  # Explicit list is safer for dev
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
+
+# Backward-compatible auth routes for REDIRECT_URI configs without /api/v1.
+from app.api.v1.endpoints import auth as auth_endpoints
+app.include_router(auth_endpoints.router, prefix="/auth", tags=["Authentication"])
 
 @app.get("/")
 def root():

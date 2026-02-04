@@ -65,6 +65,9 @@ class GitHubService:
         response_data = response.json()
 
         if "error" in response_data:
+            # Use a safe fallback for error detail
+            detail = response_data.get("error_description") or response_data.get("error") or "Unknown error"
+            raise HTTPException(status_code=400, detail=detail)
             raise HTTPException(status_code=400, detail=response_data.get("error_description"))
 
         return response_data.get("access_token")
