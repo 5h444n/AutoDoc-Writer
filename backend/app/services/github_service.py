@@ -139,7 +139,7 @@ class GitHubService:
         url = f"https://api.github.com/repos/{repo_full_name}/git/trees/{ref}"
         headers = GitHubService._headers(access_token)
         params = {"recursive": "1"}
-        response = requests.get(url, headers=headers, params=params)
+        response = GitHubService._request("get", url, headers=headers, params=params)
         GitHubService._raise_for_status(response, "Failed to fetch repository tree")
         return response.json().get("tree", [])
 

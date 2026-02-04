@@ -8,8 +8,10 @@ from app.models.repository import Repository
 from app.core.auth import get_current_user
 from app.core.config import settings
 from app.schemas.user import UserProfile
+from app.core.config import settings
 
 router = APIRouter()
+
 
 @router.get("/login")
 def login():
