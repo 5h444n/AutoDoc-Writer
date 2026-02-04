@@ -142,7 +142,7 @@ class TestGitHubService:
         with patch('app.services.github_service.requests.request') as mock_req:
             mock_response = Mock()
             mock_response.status_code = 200
-            mock_response.headers = {"Link": "<https://api.github.com/?page=5>; rel=\"last\""}
+            mock_response.headers = {"Link": "<https://api.github.com/?page=5>; rel=\"last\""}       
             mock_response.json.return_value = [1]
             mock_req.return_value = mock_response
 
@@ -165,10 +165,9 @@ class TestGitHubService:
             b64 = base64.b64encode(b"hello").decode()
             mock_response = Mock()
             mock_response.status_code = 200
-            mock_response.json.return_value = {"content": b64, "encoding": "base64", "sha": "abc"}
+            mock_response.json.return_value = {"content": b64, "encoding": "base64", "sha": "abc"}   
             mock_req.return_value = mock_response
 
-            content, sha = GitHubService.get_file_content("token", "owner/repo", "README.md")
+            content, sha = GitHubService.get_file_content("token", "owner/repo", "README.md")        
             assert content.strip() == "hello"
             assert sha == "abc"
-

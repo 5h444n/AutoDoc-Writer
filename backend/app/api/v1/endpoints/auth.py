@@ -5,6 +5,9 @@ from app.services.github_service import GitHubService
 from app.db.session import get_db
 from app.models.user import User
 from app.models.repository import Repository
+from app.core.auth import get_current_user
+from app.core.config import settings
+from app.schemas.user import UserProfile
 from app.core.config import settings
 
 router = APIRouter()
@@ -73,5 +76,13 @@ def callback(code: str, db: Session = Depends(get_db)):
     db.commit()
 
     # Redirect to Frontend with Token
-    frontend_url = "http://localhost:5173/auth/callback"
+    frontend_url = f"{settings.FRONTEND_URL}/auth/callback"
     return RedirectResponse(url=f"{frontend_url}?token={token}&username={user.github_username}")
+
+
+@router.get("/me", response_model=UserProfile)
+def get_me(current_user: User = Depends(get_current_user)):
+    """
+    Returns the current user's GitHub profile details.
+    """
+    return GitHubService.get_user_details(current_user.access_token)
